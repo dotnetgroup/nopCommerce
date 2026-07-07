@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <MSBuildSDKsPath Condition="'$(MSBuildSDKsPath)' == ''">C:\Program Files\dotnet\sdk\10.0.301\Sdks</MSBuildSDKsPath>
+  </PropertyGroup>
+</Project>
+
