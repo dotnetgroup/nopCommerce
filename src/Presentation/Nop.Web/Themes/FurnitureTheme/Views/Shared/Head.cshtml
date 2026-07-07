@@ -11,7 +11,10 @@
 
     //add main CSS file
     NopHtml.AppendCssFileParts($"~/Themes/{themeName}/Content/css/styles{(supportRtl ? ".rtl" : "")}.css");
-    
+
+    //add furniture theme CSS file (new layout/design work sits here, on top of the inherited base styles)
+    NopHtml.AppendCssFileParts($"~/Themes/{themeName}/Content/css/furniture-theme.css");
+
     //add swiper css file
     if (catalogSettings.DisplayAllPicturesOnCatalogPages)
     {
@@ -20,4 +23,13 @@
 
     //add jQuery UI css file
     NopHtml.AppendCssFileParts("~/lib_npm/jquery-ui-dist/jquery-ui.min.css");
+
+    //add furniture theme JS file (progressive-enhancement carousel controls)
+    NopHtml.AppendScriptParts(ResourceLocation.Footer, $"~/Themes/{themeName}/Content/js/furniture-theme.js");
 }
+@* Google Fonts — Fraunces (headings) + Inter (body/UI). Imported here in the theme's <head>
+   hook (this partial renders inside <head>), so the design-system typefaces load site-wide
+   rather than only being name-referenced in CSS. The '@@' escapes the literal '@' in the URL. *@
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@@400;500;600;700&family=Inter:wght@@400;500;600;700&display=swap" />

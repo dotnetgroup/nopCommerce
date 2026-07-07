@@ -1,0 +1,35 @@
+@model ShoppingCartModel
+@{
+    Layout = "_ColumnsOne";
+
+    //title
+    NopHtml.AddTitleParts(T("PageTitle.ShoppingCart").Text);
+    //page class
+    NopHtml.AppendPageCssClassParts("html-shopping-cart-page");
+}
+@*
+    Restyle-only override of the cart page (spec §2.4). Structure and the OrderSummary component are
+    unchanged; we only add two themed, informational blocks around it:
+      • a delivery-estimate note (§2.4)
+      • the UK 14-day cancellation notice, pre-payment (§2.4/§4)
+*@
+@if (!Model.OnePageCheckoutEnabled)
+{
+    @await Component.InvokeAsync(typeof(CheckoutProgressViewComponent), new {step = CheckoutProgressStep.Cart})
+}
+<div class="page shopping-cart-page ft-cart-page">
+    <div class="page-title">
+        <h1>@T("ShoppingCart")</h1>
+    </div>
+    <div class="page-body">
+        @if (Model.Items.Count > 0)
+        {
+            @await Html.PartialAsync("_DeliveryEstimateNote")
+        }
+        @await Component.InvokeAsync(typeof(OrderSummaryViewComponent), new { overriddenModel = Model})
+        @if (Model.Items.Count > 0)
+        {
+            @await Html.PartialAsync("_UkCancellationNotice")
+        }
+    </div>
+</div>

@@ -1,0 +1,2607 @@
+/* ==========================================================================
+   Furniture Store (UK) theme — homepage layout
+   Loaded after styles.css (inherited from the base "Responsive"/DefaultClean
+   theme) so these rules layer new "Warm Modern" presentation on top of it
+   without editing the shared file. Placeholder colors/type/imagery only —
+   exact brand palette is still an open item (see docs/theme-spec.md, §8).
+   ========================================================================== */
+
+:root {
+  /* ======================================================================
+     DESIGN SYSTEM (Step 2) — single source of truth for the whole theme.
+     Every component references these tokens; no hardcoded hex elsewhere.
+     ====================================================================== */
+
+  /* Core palette */
+  --color-bg: #FAF7F2;
+  --color-text: #2B2622;
+  --color-accent: #5C6B4F;
+  --color-cta: #B5652A;
+  --color-border: #E4DED4;
+
+  /* Supporting derived tokens (not in the brief, needed for states/surfaces) */
+  --color-surface: #FFFFFF;
+  --color-muted: #6B655C;
+  --color-accent-dark: #45543A;   /* accent hover/active */
+  --color-cta-hover: #97511F;      /* cta hover/active */
+
+  /* Typography */
+  --font-heading: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  /* 8px spacing scale */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-6: 48px;
+  --space-8: 64px;
+
+  /* Shape + elevation */
+  --radius: 8px;
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.06);
+
+  /* ----------------------------------------------------------------------
+     Back-compat aliases: Phases 0-4 CSS was written against --ft-* names.
+     They now resolve to the design-system tokens above, so the whole theme
+     re-skins from one place with no churn in the existing rules.
+     ---------------------------------------------------------------------- */
+  --ft-color-bg: var(--color-bg);
+  --ft-color-surface: var(--color-surface);
+  --ft-color-ink: var(--color-text);
+  --ft-color-muted: var(--color-muted);
+  --ft-color-accent: var(--color-accent);
+  --ft-color-cta: var(--color-cta);
+  --ft-color-cta-hover: var(--color-cta-hover);
+  --ft-color-border: var(--color-border);
+  --ft-font-display: var(--font-heading);
+  --ft-font-body: var(--font-body);
+  --ft-space-xs: var(--space-1);
+  --ft-space-sm: var(--space-2);
+  --ft-space-md: var(--space-3);
+  --ft-space-lg: var(--space-6);
+  --ft-space-xl: var(--space-8);
+  --ft-radius: var(--radius);
+  --ft-gutter: 5%; /* matches .master-wrapper-content's 90%-width / 5% side margin */
+  --ft-bottomnav-height: 56px; /* mobile bottom nav; other fixed-bottom UI stacks above this */
+
+  /* ----------------------------------------------------------------------
+     Override the base DefaultClean theme's accent variables. The base drives
+     ALL of its "default blue" (links, page-specific primary buttons, focus,
+     toggles) through these two vars — remapping them here kills the blue
+     sitewide in one move. This stylesheet loads AFTER styles.css, so we win.
+     ---------------------------------------------------------------------- */
+  --accent-blue-color: var(--color-cta);
+  --accent-blue-active-color: var(--color-cta-hover);
+  --gray-color: var(--color-text);
+  --dark-gray-color: var(--color-text);
+}
+
+/* ==========================================================================
+   GLOBAL DESIGN SYSTEM (Step 2) — typography, buttons, forms, cards.
+   Applies sitewide (loads after base styles.css), so every page — including
+   checkout, payment, login/register, account — inherits the system.
+   ========================================================================== */
+
+/* -------------------- typography -------------------- */
+
+body {
+  background-color: var(--color-bg);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--color-text);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  color: var(--color-text);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+/* Type scale — mobile-first (h1 28 / h2 24), scaled up on tablet+ (h1 40 / h2 32) */
+h1 { font-size: 28px; }
+h2 { font-size: 24px; }
+h3 { font-size: 20px; }
+h4 { font-size: 18px; }
+h5, h6 { font-size: 16px; }
+
+small,
+.ft-meta {
+  font-size: 14px;
+}
+
+@media (min-width: 576px) {
+  h1 { font-size: 40px; }
+  h2 { font-size: 32px; }
+  h3 { font-size: 24px; }
+}
+
+/* -------------------- buttons (sitewide) --------------------
+   nopCommerce uses .button-1 (primary) and .button-2 (secondary) across every
+   page. We set the design-system defaults here; more-specific base rules that
+   set a background already resolve to --color-cta via the accent-var override. */
+
+.button-1,
+.button-2,
+button,
+input[type="submit"],
+input[type="button"],
+input[type="reset"] {
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-weight: 600;
+}
+
+/* Primary CTA — terracotta, white text. Catches any .button-1 not covered by a
+   more specific base rule (those already inherit --color-cta via the var swap). */
+.button-1,
+input[type="submit"] {
+  border: none;
+  background-color: var(--color-cta);
+  color: #fff;
+  text-transform: none;
+  transition: background-color 0.2s ease;
+}
+
+.button-1:hover,
+.button-1:focus,
+input[type="submit"]:hover,
+input[type="submit"]:focus {
+  background-color: var(--color-cta-hover);
+  color: #fff;
+}
+
+/* Secondary / outline — accent border + text, transparent fill */
+.button-2 {
+  border: 1px solid var(--color-accent);
+  background-color: transparent;
+  color: var(--color-accent);
+  text-transform: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.button-2:hover,
+.button-2:focus {
+  background-color: var(--color-accent);
+  color: #fff;
+}
+
+/* -------------------- forms / inputs (sitewide) -------------------- */
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+input[type="url"],
+textarea,
+select {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-size: 16px;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+
+/* Accent focus ring; removes the browser/base default focus look (no blue glow) */
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="search"]:focus,
+input[type="url"]:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(92, 107, 79, 0.18); /* --color-accent @ 18% */
+  outline: none;
+  color: var(--color-text);
+}
+
+/* -------------------- card utility -------------------- */
+
+.ft-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+}
+
+.ft-placeholder-tag {
+  display: inline-block;
+  font-family: var(--ft-font-body);
+  font-size: 11px;
+  font-style: italic;
+  color: var(--ft-color-muted);
+  opacity: 0.75;
+}
+
+/* -------------------- shared building blocks -------------------- */
+
+.ft-full-bleed {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+
+.ft-section-header {
+  padding: 0 var(--ft-gutter);
+  margin: 0 0 var(--ft-space-md);
+}
+
+.ft-section-header h2 {
+  font-size: 22px;
+  margin: 0;
+}
+
+.ft-btn {
+  display: inline-block;
+  padding: 14px 28px;
+  border-radius: var(--ft-radius);
+  font-family: var(--ft-font-body);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.ft-btn--primary {
+  background-color: var(--ft-color-cta);
+  color: #fff;
+}
+
+.ft-btn--primary:hover,
+.ft-btn--primary:focus {
+  background-color: var(--ft-color-cta-hover);
+}
+
+/* Horizontally-scrolling "shelf" used by both the category band and the
+   featured-products carousel: full-bleed on mobile so tiles can peek off
+   the edge of the screen, contained again from tablet up. */
+.ft-scroller {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  gap: var(--ft-space-sm);
+  padding: 0 var(--ft-gutter) var(--ft-space-sm);
+}
+
+.ft-scroller::-webkit-scrollbar {
+  height: 6px;
+}
+
+.ft-scroller::-webkit-scrollbar-thumb {
+  background-color: var(--ft-color-border);
+  border-radius: 3px;
+}
+
+/* ==========================================================================
+   1. Hero
+   ========================================================================== */
+
+.ft-hero {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  margin-bottom: var(--ft-space-lg);
+  background: linear-gradient(135deg, #efe6d8 0%, #e3d5c2 45%, #cdbfa8 100%);
+  min-height: 380px;
+  display: flex;
+  align-items: center;
+}
+
+.ft-hero__inner {
+  width: 90%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: var(--ft-space-xl) 0;
+  text-align: center;
+}
+
+.ft-hero__eyebrow {
+  margin: 0 0 var(--ft-space-xs);
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ft-color-accent);
+}
+
+.ft-hero__headline {
+  margin: 0 0 var(--ft-space-sm);
+  font-size: 32px;
+  line-height: 1.15;
+}
+
+.ft-hero__subhead {
+  margin: 0 0 var(--ft-space-md);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ft-color-muted);
+}
+
+.ft-hero__subhead .ft-placeholder-tag {
+  display: block;
+  margin-top: var(--ft-space-xs);
+}
+
+/* ==========================================================================
+   2. Category navigation band
+   ========================================================================== */
+
+.ft-categories {
+  margin-bottom: var(--ft-space-lg);
+}
+
+.ft-categories__scroller {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  gap: var(--ft-space-sm);
+  padding: 0 var(--ft-gutter) var(--ft-space-sm);
+}
+
+.ft-category-tile {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  width: 132px;
+  text-decoration: none;
+  color: var(--ft-color-ink);
+}
+
+.ft-category-tile__image {
+  display: block;
+  position: relative;
+  width: 100%;
+  padding-top: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: var(--ft-color-surface);
+  border: 1px solid var(--ft-color-border);
+  margin-bottom: var(--ft-space-xs);
+}
+
+.ft-category-tile__image img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.ft-category-tile:hover .ft-category-tile__image img,
+.ft-category-tile:focus .ft-category-tile__image img {
+  transform: scale(1.06);
+}
+
+.ft-category-tile__label {
+  display: block;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   3. Featured products carousel
+   ========================================================================== */
+
+.ft-featured {
+  margin-bottom: var(--ft-space-lg);
+}
+
+.ft-carousel {
+  position: relative;
+}
+
+/* Reuse of the base theme's HomepageProducts component output: override its
+   block-grid layout (defined for .item-grid / .item-box in styles.css) with
+   a horizontal-scrolling carousel, scoped tightly to this wrapper only. */
+.ft-carousel .product-grid.home-page-product-grid {
+  margin: 0;
+}
+
+.ft-carousel .product-grid .title {
+  padding: 0 var(--ft-gutter);
+  margin: 0 0 var(--ft-space-md);
+  border-bottom: none;
+  font-size: 22px;
+  font-family: var(--ft-font-display);
+  color: var(--ft-color-ink);
+}
+
+.ft-carousel .item-grid {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  gap: var(--ft-space-md);
+  padding: 0 var(--ft-gutter) var(--ft-space-sm);
+  margin: 0;
+}
+
+.ft-carousel .item-grid:after {
+  content: none;
+}
+
+.ft-carousel .item-box {
+  float: none !important;
+  width: 220px !important;
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  margin: 0 !important;
+}
+
+.ft-carousel__nav {
+  display: none;
+}
+
+/* ==========================================================================
+   4. Trust / USP band
+   ========================================================================== */
+
+.ft-trust {
+  background-color: var(--ft-color-surface);
+  border-top: 1px solid var(--ft-color-border);
+  border-bottom: 1px solid var(--ft-color-border);
+  margin-bottom: var(--ft-space-lg);
+}
+
+.ft-trust__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ft-space-md);
+  padding: var(--ft-space-lg) var(--ft-gutter);
+  margin: 0;
+  list-style: none;
+}
+
+.ft-trust__item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ft-space-sm);
+}
+
+.ft-trust__icon {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  color: var(--ft-color-accent);
+}
+
+.ft-trust__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.ft-trust__text {
+  display: block;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ft-color-muted);
+}
+
+.ft-trust__text strong {
+  display: block;
+  font-size: 15px;
+  color: var(--ft-color-ink);
+  margin-bottom: 2px;
+}
+
+/* ==========================================================================
+   5. Newsletter signup
+   ========================================================================== */
+
+.ft-newsletter {
+  margin-bottom: var(--ft-space-lg);
+  padding: 0 var(--ft-gutter);
+}
+
+.ft-newsletter__inner {
+  background-color: var(--ft-color-accent);
+  border-radius: var(--ft-radius);
+  padding: var(--ft-space-lg) var(--ft-space-md);
+  text-align: center;
+}
+
+.ft-newsletter .newsletter {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.ft-newsletter .newsletter .title {
+  font-family: var(--ft-font-display);
+  font-size: 24px;
+  color: #fff;
+  margin: 0 0 var(--ft-space-sm);
+}
+
+.ft-newsletter .newsletter-subscribe {
+  display: block;
+}
+
+.ft-newsletter .newsletter-email {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ft-space-xs);
+  overflow: visible;
+  width: 100%;
+}
+
+.ft-newsletter .newsletter-email input[type="email"] {
+  float: none;
+  width: 100%;
+  height: 44px;
+  margin: 0;
+  border-radius: var(--ft-radius);
+  border: none;
+  padding: 0 var(--ft-space-sm);
+}
+
+.ft-newsletter .newsletter-subscribe-button {
+  float: none;
+  height: 44px;
+  border-radius: var(--ft-radius);
+  background-color: var(--ft-color-cta);
+}
+
+.ft-newsletter .newsletter-subscribe-button:hover,
+.ft-newsletter .newsletter-subscribe-button:focus {
+  background-color: var(--ft-color-cta-hover);
+}
+
+.ft-newsletter .newsletter-email .options {
+  color: #fff;
+}
+
+.ft-newsletter .newsletter-validation,
+.ft-newsletter .newsletter-result {
+  color: #fff;
+}
+
+/* ==========================================================================
+   Breakpoints — mobile-first per docs/theme-spec.md §6
+   < 576px  : mobile (base styles above)
+   576–991px: tablet
+   >= 992px : desktop
+   ========================================================================== */
+
+/* ---- Tablet: 576px and up ---- */
+@media (min-width: 576px) {
+  .ft-hero__headline {
+    font-size: 40px;
+  }
+
+  .ft-category-tile {
+    width: 160px;
+  }
+
+  .ft-carousel .item-box {
+    width: 260px !important;
+  }
+
+  .ft-trust__list {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .ft-trust__item {
+    flex: 0 0 calc(50% - var(--ft-space-md) / 2);
+  }
+
+  .ft-newsletter .newsletter-subscribe {
+    display: flex;
+  }
+
+  .ft-newsletter .newsletter-email {
+    flex-direction: row;
+  }
+
+  .ft-newsletter .newsletter-email input[type="email"] {
+    flex: 1 1 auto;
+  }
+
+  .ft-newsletter .newsletter-subscribe-button {
+    flex: 0 0 auto;
+    padding: 0 var(--ft-space-md);
+  }
+}
+
+/* ---- Desktop: 992px and up ---- */
+@media (min-width: 992px) {
+  .ft-hero {
+    min-height: 480px;
+  }
+
+  .ft-hero__inner {
+    padding: 96px 0;
+  }
+
+  .ft-hero__headline {
+    font-size: 52px;
+  }
+
+  .ft-hero__subhead {
+    font-size: 17px;
+  }
+
+  .ft-category-tile {
+    width: 180px;
+  }
+
+  .ft-carousel .item-box {
+    width: 280px !important;
+  }
+
+  .ft-carousel__nav {
+    display: block;
+  }
+
+  .ft-carousel__btn {
+    position: absolute;
+    top: 40%;
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--ft-color-border);
+    background-color: var(--ft-color-surface);
+    color: var(--ft-color-ink);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .ft-carousel__btn--prev {
+    left: 8px;
+  }
+
+  .ft-carousel__btn--next {
+    right: 8px;
+  }
+
+  .ft-trust__list {
+    flex-wrap: nowrap;
+  }
+
+  .ft-trust__item {
+    flex: 1 1 0;
+  }
+}
+
+/* ==========================================================================
+   PHASE 1 — Category / Listing page (docs/theme-spec.md §2.2)
+   Scoped to the actual "listing" pages (category, manufacturer, search,
+   vendor, product-tag) via the page-body classes nopCommerce already adds
+   via NopHtml.AppendPageCssClassParts(...), so Customer/Blog pages that also
+   use the shared _ColumnsTwo layout are left exactly as inherited.
+   ========================================================================== */
+
+/* -------------------- desktop sidebar + content layout -------------------- */
+
+@media (min-width: 992px) {
+  .html-category-page .master-column-wrapper,
+  .html-manufacturer-page .master-column-wrapper,
+  .html-search-page .master-column-wrapper,
+  .html-vendor-page .master-column-wrapper,
+  .html-product-tag-page .master-column-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--ft-space-lg);
+  }
+
+  .html-category-page .side-2,
+  .html-manufacturer-page .side-2,
+  .html-search-page .side-2,
+  .html-vendor-page .side-2,
+  .html-product-tag-page .side-2 {
+    float: none;
+    width: 260px;
+    flex: 0 0 260px;
+  }
+
+  .html-category-page .center-2,
+  .html-manufacturer-page .center-2,
+  .html-search-page .center-2,
+  .html-vendor-page .center-2,
+  .html-product-tag-page .center-2 {
+    float: none;
+    width: auto;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
+
+/* -------------------- toolbar (sort / page size / view mode) -------------------- */
+
+.ft-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ft-space-sm) var(--ft-space-md);
+  padding: var(--ft-space-sm) 0;
+  margin-bottom: var(--ft-space-md);
+  border-top: 1px solid var(--ft-color-border);
+  border-bottom: 1px solid var(--ft-color-border);
+  font-size: 13px;
+  color: var(--ft-color-muted);
+}
+
+.ft-toolbar > div {
+  display: flex;
+  align-items: center;
+  gap: var(--ft-space-xs);
+}
+
+.ft-toolbar select {
+  border: 1px solid var(--ft-color-border);
+  border-radius: var(--ft-radius);
+  background-color: var(--ft-color-surface);
+  padding: 6px 28px 6px 10px;
+  font-size: 13px;
+  color: var(--ft-color-ink);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='%236f6a62' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+
+.ft-toolbar .viewmode-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--ft-color-border);
+  border-radius: var(--ft-radius);
+  font-size: 0;
+  color: var(--ft-color-muted);
+}
+
+.ft-toolbar .viewmode-icon.selected {
+  border-color: var(--ft-color-accent);
+  color: var(--ft-color-accent);
+}
+
+/* -------------------- filters: mobile trigger + bottom-sheet drawer -------------------- */
+
+.ft-filters-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ft-space-xs);
+  width: 100%;
+  padding: 12px;
+  margin-bottom: var(--ft-space-md);
+  border: 1px solid var(--ft-color-border);
+  border-radius: var(--ft-radius);
+  background-color: var(--ft-color-surface);
+  color: var(--ft-color-ink);
+  font-family: var(--ft-font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ft-filters-trigger svg {
+  width: 18px;
+  height: 18px;
+}
+
+.ft-filter-backdrop {
+  display: none;
+}
+
+.ft-filters__header,
+.ft-filters__footer {
+  display: none;
+}
+
+@media (max-width: 991.98px) {
+  .ft-filter-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background-color: rgba(43, 42, 40, 0.45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+
+  .ft-filter-backdrop.ft-filter-backdrop--visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .ft-filters {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1001;
+    max-height: 82vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--ft-color-surface);
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.18);
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+  }
+
+  .ft-filters.ft-filters--open {
+    transform: translateY(0);
+  }
+
+  .ft-filters__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--ft-space-md);
+    border-bottom: 1px solid var(--ft-color-border);
+    flex: 0 0 auto;
+  }
+
+  .ft-filters__title {
+    margin: 0;
+    font-size: 18px;
+  }
+
+  .ft-filters__close {
+    border: none;
+    background: none;
+    font-size: 24px;
+    line-height: 1;
+    color: var(--ft-color-muted);
+    cursor: pointer;
+  }
+
+  .ft-filters__body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 0 var(--ft-space-md);
+  }
+
+  .ft-filters__footer {
+    display: block;
+    flex: 0 0 auto;
+    padding: var(--ft-space-md);
+    border-top: 1px solid var(--ft-color-border);
+  }
+
+  .ft-filters__apply {
+    display: block;
+    width: 100%;
+  }
+}
+
+@media (min-width: 992px) {
+  .ft-filters-trigger {
+    display: none;
+  }
+}
+
+body.ft-no-scroll {
+  overflow: hidden;
+}
+
+/* -------------------- filter groups (accordion) + chips -------------------- */
+
+.ft-filter-group {
+  border-bottom: 1px solid var(--ft-color-border);
+  padding: var(--ft-space-sm) 0;
+}
+
+.ft-filter-group:first-of-type {
+  padding-top: 0;
+}
+
+.ft-filter-group__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--ft-font-body);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ft-color-ink);
+  padding: 4px 0;
+}
+
+.ft-filter-group__summary::-webkit-details-marker {
+  display: none;
+}
+
+.ft-filter-group__summary::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-right: 1.5px solid var(--ft-color-muted);
+  border-bottom: 1.5px solid var(--ft-color-muted);
+  transform: rotate(45deg);
+  transition: transform 0.2s ease;
+}
+
+.ft-filter-group[open] > .ft-filter-group__summary::after {
+  transform: rotate(-135deg);
+}
+
+.ft-filter-group__content {
+  padding-top: var(--ft-space-sm);
+}
+
+.ft-filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ft-space-xs);
+  margin: 0 0 var(--ft-space-sm);
+}
+
+.ft-filter-chips .name {
+  flex-basis: 100%;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ft-color-muted);
+  margin-bottom: 4px;
+}
+
+.ft-filter-chip {
+  position: relative;
+}
+
+.ft-filter-chip input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+}
+
+.ft-filter-chip label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: 1px solid var(--ft-color-border);
+  border-radius: 999px;
+  font-size: 13px;
+  color: var(--ft-color-ink);
+  background-color: var(--ft-color-surface);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.ft-filter-chip input:checked + label {
+  border-color: var(--ft-color-accent);
+  background-color: var(--ft-color-accent);
+  color: #fff;
+}
+
+.ft-filter-chip.color-item label {
+  padding: 4px 12px 4px 4px;
+  border-radius: 999px;
+}
+
+.ft-filter-chip.color-item .attribute-square {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.ft-filter-chip.color-item input:checked + label {
+  border-color: var(--ft-color-accent);
+  background-color: transparent;
+  color: var(--ft-color-ink);
+  box-shadow: 0 0 0 1.5px var(--ft-color-accent);
+}
+
+#price-range-slider {
+  margin: var(--ft-space-sm) 4px var(--ft-space-xs);
+}
+
+.selected-price-range {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--ft-color-muted);
+}
+
+/* -------------------- product grid -------------------- */
+
+.html-category-page .product-grid .item-grid,
+.html-manufacturer-page .product-grid .item-grid,
+.html-search-page .product-grid .item-grid,
+.html-vendor-page .product-grid .item-grid,
+.html-product-tag-page .product-grid .item-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--ft-space-lg) var(--ft-space-md);
+}
+
+.html-category-page .product-grid .item-grid:after,
+.html-manufacturer-page .product-grid .item-grid:after,
+.html-search-page .product-grid .item-grid:after,
+.html-vendor-page .product-grid .item-grid:after,
+.html-product-tag-page .product-grid .item-grid:after {
+  content: none;
+}
+
+.html-category-page .product-grid .item-box,
+.html-manufacturer-page .product-grid .item-box,
+.html-search-page .product-grid .item-box,
+.html-vendor-page .product-grid .item-box,
+.html-product-tag-page .product-grid .item-box {
+  float: none !important;
+  width: auto !important;
+  margin: 0 !important;
+}
+
+@media (min-width: 576px) {
+  .html-category-page .product-grid .item-grid,
+  .html-manufacturer-page .product-grid .item-grid,
+  .html-search-page .product-grid .item-grid,
+  .html-vendor-page .product-grid .item-grid,
+  .html-product-tag-page .product-grid .item-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 992px) {
+  .html-category-page .product-grid .item-grid,
+  .html-manufacturer-page .product-grid .item-grid,
+  .html-search-page .product-grid .item-grid,
+  .html-vendor-page .product-grid .item-grid,
+  .html-product-tag-page .product-grid .item-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* -------------------- product card polish (shared by every page that uses _ProductBox) -------------------- */
+
+.ft-product-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  padding-bottom: var(--space-2);
+}
+
+.ft-product-card .picture a:before {
+  padding-top: 100%;
+}
+
+.ft-product-card .picture img {
+  transition: transform 0.4s ease;
+}
+
+.ft-product-card:hover .picture img {
+  transform: scale(1.04);
+}
+
+.ft-product-card .details {
+  padding: var(--space-2) var(--space-2) 0;
+}
+
+.ft-product-card .product-title a {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.ft-swatch-dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 10px;
+}
+
+.ft-swatch-dots__dot {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.ft-swatch-dots__more {
+  font-size: 11px;
+  color: var(--ft-color-muted);
+}
+
+.ft-price-row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ft-vat-note {
+  font-size: 12px;
+  font-weight: normal;
+  color: var(--ft-color-muted);
+}
+
+/* -------------------- pagination -------------------- */
+
+.pager {
+  margin: var(--ft-space-lg) 0;
+}
+
+.pager ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pager li a,
+.pager li span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--ft-color-border);
+  border-radius: var(--ft-radius);
+  font-size: 13px;
+  color: var(--ft-color-ink);
+  text-decoration: none;
+}
+
+.pager li.current-page span {
+  background-color: var(--ft-color-accent);
+  border-color: var(--ft-color-accent);
+  color: #fff;
+}
+
+.pager li a:hover {
+  border-color: var(--ft-color-accent);
+  color: var(--ft-color-accent);
+}
+
+.pager li.total-summary {
+  flex-basis: 100%;
+  text-align: center;
+  font-size: 13px;
+  color: var(--ft-color-muted);
+  margin-bottom: var(--ft-space-xs);
+}
+
+/* ==========================================================================
+   PHASE 2 — Product Detail Page (docs/theme-spec.md §2.3)
+   Scoped to .ft-pdp (added on the product-details page wrapper) plus the
+   shared partials it renders, so nothing here leaks onto other pages.
+   ========================================================================== */
+
+.ft-pdp .product-name h1 {
+  font-family: var(--ft-font-display);
+  font-size: 26px;
+  line-height: 1.15;
+  color: var(--ft-color-ink);
+}
+
+@media (min-width: 992px) {
+  .ft-pdp .product-name h1 {
+    font-size: 34px;
+  }
+}
+
+/* -------------------- 1. Gallery (swipeable filmstrip on mobile) -------------------- */
+
+.ft-pdp .gallery .picture {
+  border: 1px solid var(--ft-color-border);
+  border-radius: var(--ft-radius);
+  background-color: var(--ft-color-surface);
+}
+
+.ft-pdp .picture-gallery .picture-thumbs {
+  display: flex;
+  gap: var(--ft-space-xs);
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 4px;
+}
+
+.ft-pdp .picture-gallery .picture-thumbs .thumb-item {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  width: 72px;
+  height: 72px;
+  margin: 0;
+  border: 1px solid var(--ft-color-border);
+  border-radius: var(--ft-radius);
+  background-color: var(--ft-color-surface);
+}
+
+@media (min-width: 992px) {
+  .ft-pdp .picture-gallery .picture-thumbs {
+    flex-wrap: wrap;
+  }
+
+  .ft-pdp .picture-gallery .picture-thumbs .thumb-item {
+    width: 84px;
+    height: 84px;
+  }
+}
+
+/* -------------------- 2. Price block + VAT note + BNPL slot -------------------- */
+
+.ft-pdp .ft-pdp-prices {
+  margin: var(--ft-space-sm) 0;
+}
+
+.ft-pdp .ft-pdp-prices .product-price span,
+.ft-pdp .ft-pdp-prices .non-discounted-price span {
+  font-family: var(--ft-font-display);
+  font-size: 28px;
+  color: var(--ft-color-ink);
+}
+
+.ft-pdp .ft-pdp-prices .old-product-price span {
+  color: var(--ft-color-muted);
+  text-decoration: line-through;
+  font-size: 16px;
+}
+
+.ft-vat-note--pdp {
+  font-size: 13px;
+  color: var(--ft-color-muted);
+  margin-top: 2px;
+}
+
+.ft-bnpl-slot {
+  margin: var(--ft-space-sm) 0 0;
+  padding: 10px 14px;
+  border: 1px dashed var(--ft-color-border);
+  border-radius: var(--ft-radius);
+  background-color: var(--ft-color-surface);
+}
+
+.ft-bnpl-slot__placeholder {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ft-color-ink);
+}
+
+/* -------------------- 3. Swatch / chip variant selector --------------------
+   Restyle of the base theme's existing _ProductAttributes markup (no cshtml
+   override): RadioList (.option-list) becomes chips, and ColorSquares /
+   ImageSquares (.attribute-squares) become round/rounded swatches. All the
+   underlying inputs, ids and combination JS are the untouched base markup. */
+
+.ft-pdp .attributes dt {
+  margin-bottom: var(--ft-space-xs);
+  font-weight: 600;
+  color: var(--ft-color-ink);
+}
+
+.ft-pdp .attributes .option-list:not(.attribute-squares) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ft-space-xs);
+}
+
+.ft-pdp .attributes .option-list:not(.attribute-squares) li {
+  margin: 0;
+}
+
+.ft-pdp .attributes .option-list:not(.attribute-squares) li input[type="radio"],
+.ft-pdp .attributes .option-list:not(.attribute-squares) li input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.ft-pdp .attributes .option-list:not(.attribute-squares) li label {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  border: 1px solid var(--ft-color-border);
+  border-radius: 999px;
+  background-color: var(--ft-color-surface);
+  font-size: 14px;
+  color: var(--ft-color-ink);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+
+.ft-pdp .attributes .option-list:not(.attribute-squares) li input:checked + label {
+  border-color: var(--ft-color-accent);
+  background-color: var(--ft-color-accent);
+  color: #fff;
+}
+
+/* colour / image swatches */
+.ft-pdp .attributes .attribute-squares li {
+  margin: 0 10px 10px 0;
+}
+
+.ft-pdp .attributes .attribute-squares .attribute-square-container {
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+
+.ft-pdp .attributes .attribute-squares.image-squares .attribute-square-container {
+  border-radius: var(--ft-radius);
+}
+
+.ft-pdp .attributes .attribute-squares li.selected-value .attribute-square-container {
+  box-shadow: 0 0 0 2px var(--ft-color-accent);
+}
+
+/* -------------------- 4. Dimension / scale block -------------------- */
+
+.ft-dimensions {
+  margin: var(--ft-space-lg) 0;
+  padding: var(--ft-space-md) 0;
+  border-top: 1px solid var(--ft-color-border);
+}
+
+.ft-dimensions__title {
+  font-size: 20px;
+  margin: 0 0 var(--ft-space-md);
+}
+
+.ft-dimensions__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--ft-space-md);
+}
+
+.ft-dimensions__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ft-dimensions__table th,
+.ft-dimensions__table td {
+  text-align: left;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--ft-color-border);
+  font-size: 14px;
+  vertical-align: top;
+}
+
+.ft-dimensions__table th {
+  width: 45%;
+  font-weight: 600;
+  color: var(--ft-color-ink);
+}
+
+.ft-dimensions__table td {
+  color: var(--ft-color-muted);
+}
+
+.ft-dimensions__fit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ft-space-sm);
+  padding: var(--ft-space-md);
+  background-color: var(--ft-color-surface);
+  border: 1px solid var(--ft-color-border);
+  border-radius: var(--ft-radius);
+  color: var(--ft-color-accent);
+}
+
+.ft-dimensions__fit-graphic {
+  width: 160px;
+  height: auto;
+}
+
+.ft-dimensions__fit-note {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ft-color-muted);
+  text-align: center;
+}
+
+@media (min-width: 992px) {
+  .ft-dimensions__grid {
+    grid-template-columns: 1.4fr 1fr;
+    align-items: start;
+  }
+}
+
+/* -------------------- generic spec table -------------------- */
+
+.ft-spec-table {
+  margin: var(--ft-space-lg) 0;
+}
+
+.ft-spec-table__title {
+  font-size: 20px;
+  margin: 0 0 var(--ft-space-md);
+  border: none;
+}
+
+.ft-spec-table__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ft-spec-table__table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--ft-color-border);
+  font-size: 14px;
+}
+
+.ft-spec-table__table .spec-name {
+  width: 30%;
+  font-weight: 600;
+  color: var(--ft-color-ink);
+}
+
+.ft-spec-table__table .spec-value {
+  color: var(--ft-color-muted);
+}
+
+.ft-spec-table__table .spec-header .spec-group-name {
+  background-color: var(--ft-color-surface);
+  font-family: var(--ft-font-display);
+  font-size: 15px;
+  color: var(--ft-color-ink);
+}
+
+/* -------------------- 5. Compliance block (conditional) -------------------- */
+
+.ft-compliance {
+  display: flex;
+  gap: var(--ft-space-md);
+  margin: var(--ft-space-lg) 0;
+  padding: var(--ft-space-md);
+  border: 1px solid var(--ft-color-border);
+  border-left: 4px solid var(--ft-color-accent);
+  border-radius: var(--ft-radius);
+  background-color: var(--ft-color-surface);
+}
+
+.ft-compliance__icon {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  color: var(--ft-color-accent);
+}
+
+.ft-compliance__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.ft-compliance__title {
+  font-size: 17px;
+  margin: 0 0 var(--ft-space-xs);
+}
+
+.ft-compliance__intro {
+  margin: 0 0 var(--ft-space-sm);
+  font-size: 14px;
+  color: var(--ft-color-muted);
+}
+
+.ft-compliance__list {
+  list-style: none;
+  margin: 0 0 var(--ft-space-sm);
+  padding: 0;
+}
+
+.ft-compliance__list li {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--ft-color-border);
+  font-size: 14px;
+}
+
+.ft-compliance__label {
+  font-weight: 600;
+  color: var(--ft-color-ink);
+}
+
+.ft-compliance__value {
+  color: var(--ft-color-muted);
+}
+
+.ft-compliance__note {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ft-color-muted);
+}
+
+/* -------------------- cross-sell "complete the room" -------------------- */
+
+.ft-cross-sell {
+  margin: var(--ft-space-xl) 0 var(--ft-space-lg);
+}
+
+.ft-cross-sell__title {
+  font-family: var(--ft-font-display);
+  font-size: 24px;
+  margin: 0 0 var(--ft-space-md);
+  border-bottom: none;
+  color: var(--ft-color-ink);
+}
+
+/* -------------------- 6. Sticky mobile Add-to-Basket bar -------------------- */
+
+.ft-sticky-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: var(--ft-bottomnav-height); /* stack above the mobile bottom nav */
+  z-index: 940;
+  display: flex;
+  align-items: center;
+  gap: var(--ft-space-sm);
+  padding: 10px var(--ft-gutter);
+  background-color: var(--ft-color-surface);
+  border-top: 1px solid var(--ft-color-border);
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(100%);
+  transition: transform 0.25s ease;
+}
+
+.ft-sticky-bar--visible {
+  transform: translateY(0);
+}
+
+.ft-sticky-bar__info {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ft-sticky-bar__name {
+  font-size: 12px;
+  color: var(--ft-color-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ft-sticky-bar__price {
+  font-family: var(--ft-font-display);
+  font-size: 18px;
+  color: var(--ft-color-ink);
+}
+
+.ft-sticky-bar__button {
+  flex: 0 0 auto;
+  padding: 12px 24px;
+  border: none;
+  border-radius: var(--ft-radius);
+  background-color: var(--ft-color-cta);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ft-sticky-bar__button:hover,
+.ft-sticky-bar__button:focus {
+  background-color: var(--ft-color-cta-hover);
+}
+
+/* Sticky bar is a mobile/tablet feature only — never show it on desktop. */
+@media (min-width: 992px) {
+  .ft-sticky-bar {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   PHASE 3 — Cart & Checkout restyle (docs/theme-spec.md §2.4)
+   Visual only. No structural/field/flow changes. Scoped to the cart, checkout
+   and order-confirm page classes plus the two new info blocks and the address
+   form, so nothing here alters checkout behaviour.
+   ========================================================================== */
+
+/* -------------------- shared info blocks (delivery estimate + cancellation) -------------------- */
+
+.ft-delivery-estimate,
+.ft-cancellation-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ft-space-sm);
+  padding: var(--ft-space-md);
+  margin: var(--ft-space-md) 0;
+  border: 1px solid var(--ft-color-border);
+  border-radius: var(--ft-radius);
+  background-color: var(--ft-color-surface);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ft-color-muted);
+}
+
+.ft-cancellation-notice {
+  border-left: 4px solid var(--ft-color-accent);
+}
+
+.ft-delivery-estimate__icon,
+.ft-cancellation-notice__icon {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  color: var(--ft-color-accent);
+}
+
+.ft-delivery-estimate__icon svg,
+.ft-cancellation-notice__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.ft-delivery-estimate__text strong,
+.ft-cancellation-notice__text strong {
+  color: var(--ft-color-ink);
+}
+
+.ft-cancellation-notice__link {
+  color: var(--ft-color-accent);
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.ft-cancellation-notice__link:hover,
+.ft-cancellation-notice__link:focus {
+  color: var(--ft-color-cta);
+}
+
+/* -------------------- checkout progress (steps) -------------------- */
+
+.html-checkout-page .order-progress,
+.html-shopping-cart-page .order-progress {
+  margin-bottom: var(--ft-space-lg);
+}
+
+.html-checkout-page .order-progress ul,
+.html-shopping-cart-page .order-progress ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--ft-space-xs) var(--ft-space-sm);
+}
+
+.html-checkout-page .order-progress li.active-step a,
+.html-shopping-cart-page .order-progress li.active-step a {
+  color: var(--ft-color-accent);
+  font-weight: 600;
+}
+
+/* -------------------- cart table -------------------- */
+
+.ft-cart-page .cart th {
+  background-color: var(--ft-color-surface);
+  border-color: var(--ft-color-border);
+  color: var(--ft-color-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 12px 10px;
+}
+
+.ft-cart-page .cart td {
+  border-color: transparent var(--ft-color-border) var(--ft-color-border);
+  padding: 16px 12px;
+}
+
+.ft-cart-page .cart .product a.product-name {
+  font-weight: 600;
+  color: var(--ft-color-ink);
+}
+
+.ft-cart-page .cart .product-subtotal {
+  font-weight: 600;
+  color: var(--ft-color-ink);
+}
+
+/* -------------------- cart totals + checkout button -------------------- */
+
+.ft-cart-page .cart-footer .total-info,
+.html-checkout-page .cart-total {
+  background-color: var(--ft-color-surface);
+  border: 1px solid var(--ft-color-border);
+  border-radius: var(--ft-radius);
+  padding: var(--ft-space-sm) var(--ft-space-md);
+}
+
+.ft-cart-page .cart-total .order-total strong,
+.html-checkout-page .cart-total .order-total strong {
+  font-family: var(--ft-font-display);
+  font-size: 20px;
+  color: var(--ft-color-ink);
+}
+
+.ft-cart-page .checkout-button,
+.html-checkout-page .checkout-button {
+  background-color: var(--ft-color-cta);
+  border-radius: var(--ft-radius);
+  text-transform: none;
+  font-weight: 600;
+}
+
+.ft-cart-page .checkout-button:hover,
+.ft-cart-page .checkout-button:focus,
+.html-checkout-page .checkout-button:hover,
+.html-checkout-page .checkout-button:focus {
+  background-color: var(--ft-color-cta-hover);
+}
+
+/* estimate-shipping button in cart */
+.ft-cart-page .estimate-shipping-button {
+  display: inline-block;
+  padding: 10px 18px;
+  border: 1px solid var(--ft-color-border);
+  border-radius: var(--ft-radius);
+  color: var(--ft-color-ink);
+  font-weight: 600;
+}
+
+/* -------------------- checkout sections + buttons -------------------- */
+
+.html-checkout-page .section {
+  background-color: var(--ft-color-surface);
+  border: 1px solid var(--ft-color-border);
+  border-radius: var(--ft-radius);
+  padding: var(--ft-space-md);
+  margin-bottom: var(--ft-space-md);
+}
+
+.html-checkout-page .button-1,
+.html-order-confirm-page .button-1 {
+  background-color: var(--ft-color-cta);
+  border-radius: var(--ft-radius);
+}
+
+.html-checkout-page .button-1:hover,
+.html-checkout-page .button-1:focus,
+.html-order-confirm-page .button-1:hover,
+.html-order-confirm-page .button-1:focus {
+  background-color: var(--ft-color-cta-hover);
+}
+
+/* -------------------- address form + UK postcode field -------------------- */
+
+.html-checkout-page .edit-address .inputs,
+.address-edit-page .edit-address .inputs {
+  text-align: left;
+}
+
+.html-checkout-page .edit-address .inputs label,
+.address-edit-page .edit-address .inputs label {
+  text-align: left;
+  font-weight: 600;
+  color: var(--ft-color-ink);
+  margin-bottom: 6px;
+}
+
+.html-checkout-page .edit-address .inputs input[type="text"],
+.html-checkout-page .edit-address .inputs input[type="email"],
+.html-checkout-page .edit-address .inputs input[type="tel"],
+.html-checkout-page .edit-address .inputs select,
+.address-edit-page .edit-address .inputs input[type="text"],
+.address-edit-page .edit-address .inputs input[type="email"],
+.address-edit-page .edit-address .inputs input[type="tel"],
+.address-edit-page .edit-address .inputs select {
+  border: 1px solid var(--ft-color-border);
+  border-radius: var(--ft-radius);
+  background-color: var(--ft-color-surface);
+}
+
+/* UK postcode: auto-uppercase display + comfortable letter-spacing. This targets the postcode
+   input wherever the address form renders it (ids end with "ZipPostalCode", regardless of the
+   billing/shipping field prefix). Presentation only — the submitted value is unchanged casing-wise
+   server-side, this just styles what the shopper sees while typing. */
+.edit-address input[id$="ZipPostalCode"] {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ==========================================================================
+   PHASE 4 — Global elements & UK compliance (docs/theme-spec.md §2.5 & §4)
+   Header, footer, cookie consent, footer company/VAT fields, mobile bottom nav,
+   and sitewide VAT labelling touches.
+   ========================================================================== */
+
+/* -------------------- header -------------------- */
+
+.header {
+  border-bottom: 1px solid var(--ft-color-border);
+  background-color: var(--ft-color-surface);
+}
+
+.header-logo a {
+  font-family: var(--ft-font-display);
+}
+
+.search-box .search-box-text {
+  border: 1px solid var(--ft-color-border);
+  border-radius: var(--ft-radius);
+}
+
+.header-links-wrapper .cart-label,
+.header-links-wrapper .cart-qty {
+  color: var(--ft-color-ink);
+}
+
+/* basket item-count badge emphasis (uses the base flyout cart markup) */
+.header-links-wrapper .cart-qty {
+  font-weight: 600;
+  color: var(--ft-color-cta);
+}
+
+/* -------------------- footer -------------------- */
+
+.ft-footer {
+  margin-top: var(--ft-space-xl);
+  border-top: 1px solid var(--ft-color-border);
+  background-color: var(--ft-color-surface);
+}
+
+.ft-footer .footer-block .title {
+  font-family: var(--ft-font-display);
+  color: var(--ft-color-ink);
+}
+
+/* footer company / VAT registration block */
+.ft-footer-compliance {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ft-space-xs);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--ft-space-md) var(--ft-gutter);
+  border-top: 1px solid var(--ft-color-border);
+  font-size: 13px;
+  color: var(--ft-color-muted);
+}
+
+.ft-footer-compliance__label {
+  font-weight: 600;
+  color: var(--ft-color-ink);
+  margin-right: 6px;
+}
+
+.ft-footer-compliance__vat {
+  font-style: italic;
+}
+
+@media (min-width: 768px) {
+  .ft-footer-compliance {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--ft-space-md);
+  }
+}
+
+/* -------------------- cookie consent banner -------------------- */
+/* Restyle the base centered modal into a bottom, full-width GDPR banner. */
+
+.eu-cookie-bar-notification {
+  top: auto;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  z-index: 1200;
+  border: none;
+  border-top: 1px solid var(--ft-color-border);
+  border-radius: 0;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.12);
+  background-color: var(--ft-color-surface);
+  padding: var(--ft-space-md) var(--ft-gutter);
+  text-align: left;
+}
+
+.eu-cookie-bar-notification .content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ft-space-sm);
+}
+
+.eu-cookie-bar-notification .text {
+  margin-bottom: 0;
+  font-size: 14px;
+  color: var(--ft-color-muted);
+}
+
+.eu-cookie-bar-notification .buttons-more {
+  display: flex;
+  align-items: center;
+  gap: var(--ft-space-md);
+}
+
+.eu-cookie-bar-notification button {
+  margin: 0;
+  border-radius: var(--ft-radius);
+  background-color: var(--ft-color-cta);
+  padding: 10px 20px;
+}
+
+.eu-cookie-bar-notification button:hover,
+.eu-cookie-bar-notification button:focus {
+  background-color: var(--ft-color-cta-hover);
+}
+
+.eu-cookie-bar-notification a {
+  display: inline;
+  color: var(--ft-color-accent);
+  text-decoration: underline;
+}
+
+@media (min-width: 768px) {
+  .eu-cookie-bar-notification .content {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .eu-cookie-bar-notification .buttons-more {
+    flex: 0 0 auto;
+  }
+}
+
+/* -------------------- sitewide VAT note on order totals -------------------- */
+
+.ft-vat-note--total {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 11px;
+  font-weight: normal;
+  color: var(--ft-color-muted);
+}
+
+/* -------------------- mobile bottom navigation -------------------- */
+
+.ft-bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 950;
+  height: var(--ft-bottomnav-height);
+  display: flex;
+  align-items: stretch;
+  background-color: var(--ft-color-surface);
+  border-top: 1px solid var(--ft-color-border);
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.ft-bottom-nav__item {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-decoration: none;
+  color: var(--ft-color-muted);
+  font-size: 10px;
+}
+
+.ft-bottom-nav__item svg {
+  width: 22px;
+  height: 22px;
+}
+
+.ft-bottom-nav__item:hover,
+.ft-bottom-nav__item:focus {
+  color: var(--ft-color-accent);
+}
+
+/* Reserve space so fixed bottom nav never covers page content / footer on mobile. */
+@media (max-width: 991.98px) {
+  body {
+    padding-bottom: var(--ft-bottomnav-height);
+  }
+}
+
+/* Bottom nav is a mobile/tablet feature only. */
+@media (min-width: 992px) {
+  .ft-bottom-nav {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   STEP 3 — Navigation redesign (announcement bar, sticky header shell,
+   header bands, search, utility icons + basket badge, flyout cart, main menu).
+   Restyles the base nopCommerce header/menu components — no Bootstrap defaults.
+   ========================================================================== */
+
+/* -------------------- announcement bar -------------------- */
+
+.ft-announcement {
+  background-color: var(--color-accent);
+  color: #fff;
+}
+
+.ft-announcement__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1) var(--space-2);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 8px var(--ft-gutter);
+  font-family: var(--font-body);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+.ft-announcement__sep {
+  opacity: 0.5;
+}
+
+/* -------------------- sticky header shell -------------------- */
+
+.ft-header-shell {
+  position: sticky;
+  top: 0;
+  z-index: 500;
+  background-color: var(--color-surface);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  border-bottom: 1px solid transparent;
+}
+
+.ft-header-shell--scrolled {
+  border-bottom-color: var(--color-border);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+/* the header shell owns the surface + spacing; neutralise base bottom margins so
+   the sticky block is compact and the two bands read as one unit */
+.ft-header-shell .header {
+  margin: 0;
+}
+
+.ft-header-shell .header-menu {
+  margin: 0 auto;
+  border: none;
+}
+
+/* -------------------- header bands -------------------- */
+
+.ft-header-shell .header-upper {
+  background-color: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+  padding: 6px var(--ft-gutter);
+  font-size: 13px;
+}
+
+.ft-header-shell .header-lower {
+  padding: var(--space-2) var(--ft-gutter);
+}
+
+/* -------------------- search box -------------------- */
+
+.search-box input.search-box-text {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius) 0 0 var(--radius);
+  font-family: var(--font-body);
+}
+
+.search-box .search-box-category {
+  border: 1px solid var(--color-border);
+}
+
+.search-box .search-box-button {
+  background-color: var(--color-cta);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  color: #fff;
+  text-transform: none;
+  font-weight: 600;
+}
+
+.search-box .search-box-button:hover,
+.search-box .search-box-button:focus {
+  background-color: var(--color-cta-hover);
+}
+
+/* autocomplete dropdown */
+.search-box .ui-autocomplete {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  background-color: var(--color-surface);
+  overflow: hidden;
+}
+
+/* -------------------- utility icons (account / wishlist / basket) -------------------- */
+
+.header-links a {
+  color: var(--color-text);
+  font-family: var(--font-body);
+}
+
+.header-links a:hover,
+.header-links a:focus {
+  color: var(--color-accent);
+}
+
+/* basket item-count badge */
+.header-links .ico-cart .cart-qty,
+.header-links .ico-wishlist .wishlist-qty {
+  display: inline-block;
+  min-width: 20px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background-color: var(--color-cta);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 18px;
+}
+
+.header-links .ico-wishlist .wishlist-qty {
+  background-color: var(--color-accent);
+}
+
+/* -------------------- flyout mini-cart -------------------- */
+
+.flyout-cart {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  background-color: var(--color-surface);
+}
+
+.flyout-cart .count {
+  font-family: var(--font-body);
+}
+
+.flyout-cart .buttons .button-1 {
+  background-color: var(--color-cta);
+  border-radius: var(--radius);
+  width: 100%;
+}
+
+.mini-shopping-cart .totals {
+  font-family: var(--font-heading);
+  color: var(--color-text);
+}
+
+/* -------------------- main menu (category nav) -------------------- */
+
+.ft-header-shell .header-menu {
+  background-color: var(--color-surface);
+}
+
+.menu__link,
+.menu__item-toggle {
+  font-family: var(--font-body);
+}
+
+/* --- desktop (matches the base menu's own 769px breakpoint) --- */
+@media (min-width: 769px) {
+  .menu > .menu__item {
+    background-color: transparent;
+  }
+
+  .menu > .menu__item:not(:last-child) {
+    border-right: 1px solid var(--color-border);
+  }
+
+  /* accent hover for top-level items and links */
+  .menu__item:hover > .menu__item-toggle,
+  .menu__link:hover,
+  .menu__list-view .menu__link:hover,
+  .menu__item:hover > .menu__link {
+    color: var(--color-accent);
+  }
+
+  .menu__list-view .menu__link:hover {
+    background-color: var(--color-bg);
+    color: var(--color-accent);
+  }
+
+  /* dropdown panels: design-system card look instead of the flat 2px box */
+  .menu__grid-view,
+  .menu__list-view {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+  }
+
+  .menu__group-title {
+    font-family: var(--font-heading);
+    color: var(--color-text);
+  }
+}
+
+/* --- mobile hamburger (below the base menu's 769px switch) --- */
+@media (max-width: 768.98px) {
+  .menu__toggle {
+    background-color: var(--color-accent);
+    border-radius: var(--radius);
+    padding: 16px;
+    font-family: var(--font-body);
+    font-weight: 600;
+  }
+
+  /* large touch targets for stacked items */
+  .menu__item:not(.menu-dropdown),
+  .menu__item-toggle,
+  .menu__link {
+    padding: 16px;
+    min-height: 48px;
+  }
+
+  .menu > .menu__item {
+    background-color: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .menu__link:hover,
+  .menu__item-toggle:hover {
+    color: var(--color-accent);
+  }
+}
+
+/* ==========================================================================
+   STEP 4 — Design system applied to page-specific components that carry
+   their own markup and don't inherit from the shared card/button styling:
+   account nav + dashboard, order history status badges, order details,
+   checkout step indicator, checkout method cards, payment info, wishlist,
+   search page, 404. (Global fonts/buttons/inputs/colours already cascade
+   sitewide from Step 2, so these rules only address bespoke markup.)
+   ========================================================================== */
+
+/* -------------------- shared page furniture -------------------- */
+
+.page-title h1 {
+  font-family: var(--font-heading);
+  color: var(--color-text);
+}
+
+.no-data {
+  padding: var(--space-4);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-muted);
+  text-align: center;
+}
+
+/* Generic "section" boxes on account/checkout pages become cards */
+.html-account-page .section,
+.html-checkout-page .section,
+.order-details-page .section {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+/* -------------------- account: navigation sidebar -------------------- */
+
+.block-account-navigation {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.block-account-navigation .title {
+  font-family: var(--font-heading);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+
+.block-account-navigation .list li a {
+  display: block;
+  padding: 12px var(--space-3);
+  color: var(--color-text);
+  border-left: 3px solid transparent;
+}
+
+.block-account-navigation .list li.active a,
+.block-account-navigation .list li a:hover {
+  background-color: var(--color-bg);
+  border-left-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* -------------------- order history -------------------- */
+
+.order-list .order-item {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.order-list .order-item .title {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  margin-bottom: var(--space-2);
+}
+
+/* status badges — replace the plain text status with coloured pills */
+.order-status {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.order-status.pending {
+  background-color: #FBEFE0;
+  color: #8A5A1F;
+}
+
+.order-status.processing {
+  background-color: #E7EDE2;
+  color: var(--color-accent-dark);
+}
+
+.order-status.complete {
+  background-color: #E2EFE6;
+  color: #2F6B45;
+}
+
+.order-status.cancelled {
+  background-color: #F6E4E2;
+  color: #A1352C;
+}
+
+/* -------------------- checkout step indicator -------------------- */
+
+.html-checkout-page .order-progress ul,
+.html-shopping-cart-page .order-progress ul,
+.order-details-page .order-progress ul {
+  counter-reset: ft-step;
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.html-checkout-page .order-progress li,
+.html-shopping-cart-page .order-progress li,
+.order-details-page .order-progress li {
+  counter-increment: ft-step;
+  flex: 1 1 0;
+  text-align: center;
+  position: relative;
+  font-size: 12px;
+}
+
+/* connector line between step markers */
+.html-checkout-page .order-progress li::before,
+.html-shopping-cart-page .order-progress li::before {
+  content: "";
+  position: absolute;
+  top: 15px;
+  left: -50%;
+  width: 100%;
+  height: 2px;
+  background-color: var(--color-border);
+  z-index: 0;
+}
+
+.html-checkout-page .order-progress li:first-child::before,
+.html-shopping-cart-page .order-progress li:first-child::before {
+  display: none;
+}
+
+.html-checkout-page .order-progress li a,
+.html-shopping-cart-page .order-progress li a {
+  display: block;
+  position: relative;
+  z-index: 1;
+  color: var(--color-muted);
+  text-decoration: none;
+}
+
+/* numbered circle marker */
+.html-checkout-page .order-progress li a::before,
+.html-shopping-cart-page .order-progress li a::before {
+  content: counter(ft-step);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin: 0 auto 8px;
+  border-radius: 50%;
+  background-color: var(--color-surface);
+  border: 2px solid var(--color-border);
+  color: var(--color-muted);
+  font-family: var(--font-body);
+  font-weight: 600;
+}
+
+.html-checkout-page .order-progress li.active-step a,
+.html-shopping-cart-page .order-progress li.active-step a {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.html-checkout-page .order-progress li.active-step a::before,
+.html-shopping-cart-page .order-progress li.active-step a::before {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+.html-checkout-page .order-progress li.active-step ~ li::before,
+.html-shopping-cart-page .order-progress li.active-step ~ li::before {
+  background-color: var(--color-border);
+}
+
+/* -------------------- checkout: shipping / payment method cards -------------------- */
+
+.shipping-method .method-list,
+.payment-method .method-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  text-align: left;
+  font-size: 16px;
+}
+
+.shipping-method .method-list li,
+.payment-method .method-list li {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background-color: var(--color-surface);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.shipping-method .method-list li:hover,
+.payment-method .method-list li:hover,
+.shipping-method .method-list li:has(input:checked),
+.payment-method .method-list li:has(input:checked) {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+.shipping-method .method-list li label,
+.payment-method .method-list li label {
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--color-text);
+}
+
+/* accent-coloured radios/checkboxes sitewide (kills default blue check) */
+input[type="radio"],
+input[type="checkbox"] {
+  accent-color: var(--color-accent);
+}
+
+/* -------------------- payment info table -------------------- */
+
+.payment-info .info {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+/* -------------------- wishlist -------------------- */
+
+.wishlist-content .table-wrapper {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.wishlist-page .no-data {
+  margin-top: var(--space-3);
+}
+
+/* -------------------- search page -------------------- */
+
+.search-page .search-input {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.search-page .search-input .fieldset {
+  margin: 0;
+}
+
+/* -------------------- 404 / not-found -------------------- */
+
+.not-found-page .page-body {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--ft-gutter);
+  text-align: center;
+  font-size: 16px;
+  color: var(--color-muted);
+}
+
+/* -------------------- login / register -------------------- */
+
+.login-page .customer-blocks .title,
+.registration-page .page-title h1 {
+  font-family: var(--font-heading);
+}
+
+.login-page .returning-wrapper,
+.login-page .new-wrapper {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-3);
+}
+
+/* -------------------- jQuery UI widgets -------------------- */
+/* The base overrides jQuery UI (autocomplete, dialogs, price slider) with its
+   own Arial stack. Bring those onto Inter so no default font shows anywhere. */
+.ui-widget,
+.ui-widget input,
+.ui-widget select,
+.ui-widget textarea,
+.ui-widget button,
+.ui-autocomplete,
+.ui-dialog,
+.ui-dialog-title {
+  font-family: var(--font-body) !important;
+}
+
+.ui-dialog {
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-card);
+}
+
+.ui-dialog .ui-dialog-titlebar {
+  font-family: var(--font-heading) !important;
+}

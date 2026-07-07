@@ -1,0 +1,74 @@
+@model ProductSpecificationModel
+@*
+    Reusable dimension / scale block (spec §3, items 1 & 4 — generic to ANY furniture item,
+    not sofa-specific). Data-driven: it pulls dimension-like rows out of nopCommerce's existing
+    product specification attributes by matching the attribute NAME against a keyword list, so any
+    category that records dimensions as spec attributes (tables, wardrobes, rugs, lighting…) gets
+    this block automatically with no template change. No new data model, no service calls — it reads
+    the same ProductSpecificationModel the PDP already builds.
+
+    Takes ProductSpecificationModel so it can be reused anywhere that model is available
+    (PDP today; quick-view / comparison / category intro later).
+*@
+@{
+    //keywords that identify a "physical dimension" spec attribute (case-insensitive, substring match)
+    var dimensionKeywords = new[]
+    {
+        "width", "height", "depth", "length", "diameter", "dimension",
+        "weight", "seat height", "seat depth", "seat width", "size"
+    };
+
+    //flatten every spec attribute across all groups, then keep only the dimension-like ones
+    var allAttributes = Model.Groups.SelectMany(g => g.Attributes).ToList();
+    var dimensionRows = allAttributes
+        .Where(a => !string.IsNullOrEmpty(a.Name) &&
+                    dimensionKeywords.Any(k => a.Name.Contains(k, StringComparison.OrdinalIgnoreCase)))
+        .ToList();
+}
+@if (dimensionRows.Any())
+{
+    <section class="ft-dimensions" aria-labelledby="ft-dimensions-title">
+        <h2 class="ft-dimensions__title" id="ft-dimensions-title">@T("Products.Specs")</h2>
+        <div class="ft-dimensions__grid">
+            <div class="ft-dimensions__table-wrap">
+                <table class="ft-dimensions__table">
+                    <tbody>
+                        @foreach (var attr in dimensionRows)
+                        {
+                            <tr>
+                                <th scope="row">@attr.Name</th>
+                                <td>
+                                    @for (var j = 0; j < attr.Values.Count; j++)
+                                    {
+                                        @Html.Raw(attr.Values[j].ValueRaw)
+                                        @if (j != attr.Values.Count - 1)
+                                        {
+                                            <text>,&nbsp;</text>
+                                        }
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <aside class="ft-dimensions__fit" aria-hidden="true">
+                @* "Will it fit through your door / in your room?" scale guide — generic illustrative
+                   graphic (not tied to any one product type). Placeholder art until brand assets land. *@
+                <svg class="ft-dimensions__fit-graphic" viewBox="0 0 200 140" role="img">
+                    <rect x="8" y="20" width="60" height="110" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <line x1="8" y1="20" x2="68" y2="8" stroke="currentColor" stroke-width="2"/>
+                    <line x1="68" y1="8" x2="68" y2="118" stroke="currentColor" stroke-width="2" stroke-dasharray="4 4"/>
+                    <rect x="96" y="70" width="96" height="46" rx="4" fill="currentColor" opacity="0.12"/>
+                    <rect x="96" y="70" width="96" height="46" rx="4" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <path d="M96 116 h96" stroke="currentColor" stroke-width="2"/>
+                    <path d="M104 116 v10 M184 116 v10" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+                <p class="ft-dimensions__fit-note">
+                    Check the measurements above against your doorways and room before ordering.
+                    <span class="ft-placeholder-tag">[fit-guide illustration &amp; copy placeholder]</span>
+                </p>
+            </aside>
+        </div>
+    </section>
+}

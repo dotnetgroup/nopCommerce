@@ -1,0 +1,26 @@
+@model IList<ProductOverviewModel>
+@*
+    "Complete the room" cross-sell module (spec §2.3). Reuses nopCommerce's existing related-products
+    data exactly as provided by RelatedProductsViewComponent — no new backend logic — and just
+    re-presents it as a horizontally-scrollable, swipeable shelf styled to match the theme.
+*@
+@if (Model.Count > 0)
+{
+    <section class="related-products-grid product-grid ft-cross-sell">
+        <h2 class="title ft-cross-sell__title">
+            Complete the room
+        </h2>
+        <div class="ft-carousel" data-ft-carousel>
+            <div class="item-grid ft-cross-sell__grid">
+                @foreach (var item in Model)
+                {
+                    <div class="item-box">@await Html.PartialAsync("_ProductBox", item)</div>
+                }
+            </div>
+            <div class="ft-carousel__nav">
+                <button type="button" class="ft-carousel__btn ft-carousel__btn--prev" data-ft-carousel-prev aria-label="Scroll to previous products">&#8249;</button>
+                <button type="button" class="ft-carousel__btn ft-carousel__btn--next" data-ft-carousel-next aria-label="Scroll to next products">&#8250;</button>
+            </div>
+        </div>
+    </section>
+}

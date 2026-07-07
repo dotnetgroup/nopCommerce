@@ -1,0 +1,50 @@
+@{
+    Layout = "_Root.Head";
+}
+@*
+    Theme override of the base _Root layout. Structurally identical to the base, with two additions
+    for the Step 3 navigation redesign:
+      • a slim announcement bar above the header (scrolls away — sits outside the sticky shell)
+      • a sticky "header shell" wrapping the existing header + category-menu band, so the whole
+        navigation sticks together on scroll (JS toggles a --scrolled class for the shadow).
+    No components were removed or reordered; every widget zone and partial is preserved.
+*@
+@await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.BodyStartHtmlTagAfter })
+@{ await Html.RenderPartialAsync("_Notifications"); }
+@{ await Html.RenderPartialAsync("_JavaScriptDisabledWarning"); }
+<div class="master-wrapper-page">
+    @await Component.InvokeAsync(typeof(AdminHeaderLinksViewComponent))
+
+    <div class="ft-announcement" role="note">
+        <div class="ft-announcement__inner">
+            <span>Free UK delivery over &pound;500</span>
+            <span class="ft-announcement__sep" aria-hidden="true">&bull;</span>
+            <span>14-day returns</span>
+            <span class="ft-announcement__sep" aria-hidden="true">&bull;</span>
+            <span>Fire-safety compliant furniture</span>
+        </div>
+    </div>
+
+    <div class="ft-header-shell" data-ft-header>
+        @{ await Html.RenderPartialAsync("_Header"); }
+        <div class="header-menu">
+            @await Component.InvokeAsync(typeof(MainMenuViewComponent))
+        </div>
+    </div>
+
+    <main class="master-wrapper-content" id="main">
+        @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.ContentBefore })
+
+        @if (IsSectionDefined("Breadcrumb"))
+        {
+            @RenderSection("Breadcrumb")
+        }
+        <div class="master-column-wrapper">
+            @RenderBody()
+        </div>
+        @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.ContentAfter })
+    </main>
+    @await Component.InvokeAsync(typeof(FooterViewComponent))
+</div>
+@await Component.InvokeAsync(typeof(EuCookieLawViewComponent))
+@await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.BodyEndHtmlTagBefore })

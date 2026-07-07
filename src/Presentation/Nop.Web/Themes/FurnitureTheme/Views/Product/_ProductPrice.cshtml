@@ -1,0 +1,99 @@
+@model ProductPriceModel
+
+@using Nop.Core
+@using Nop.Core.Domain.Tax
+
+@inject IWorkContext workContext
+
+@{
+    //UK requirement (§4): price always carries an inc./excl. VAT label that follows the store's real
+    //tax display setting rather than being hardcoded.
+    var pricesIncludeTax = await workContext.GetTaxDisplayTypeAsync() == TaxDisplayType.IncludingTax;
+    var showVatNote = !Model.CustomerEntersPrice && !Model.CallForPrice && !Model.HidePrices;
+}
+@if (!Model.CustomerEntersPrice)
+{
+    <div class="prices ft-pdp-prices">
+        @if (Model.CallForPrice)
+        {
+            @*call for price*@
+            <div class="product-price call-for-price">
+                <span>@T("Products.CallForPrice")</span>
+            </div>
+        }
+        else
+        {
+            if (Model.IsRental)
+            {
+                <div class="rental-price">
+                    <span>@T("Products.Price.RentalPrice"):</span>
+                    <span>@Model.RentalPrice</span>
+                </div>
+            }
+            if (!string.IsNullOrWhiteSpace(Model.OldPrice))
+            {
+                @*old price*@
+                <div class="old-product-price">
+                    <span>@T("Products.Price.OldPrice"):</span>
+                    <span>@Model.OldPrice</span>
+                </div>
+            }
+            <div class="@if (string.IsNullOrWhiteSpace(Model.PriceWithDiscount))
+                        {
+                            <text>product-price</text>
+                        }
+                        else
+                        {
+                            <text>non-discounted-price</text>
+                        }">
+                @if (!string.IsNullOrWhiteSpace(Model.OldPrice) || !string.IsNullOrWhiteSpace(Model.PriceWithDiscount))
+                {
+                    @*display "Price:" label if we have old price or discounted one*@
+                    <label for="price-value-@(Model.ProductId)">@T("Products.Price"):</label>
+                }
+                @*render price*@
+                <span @if (string.IsNullOrWhiteSpace(Model.PriceWithDiscount)) { <text> id="price-value-@(Model.ProductId)" class="price-value-@(Model.ProductId)" </text> }>
+                    @Html.Raw(Model.Price)
+                </span>
+            </div>
+            if (!string.IsNullOrWhiteSpace(Model.PriceWithDiscount))
+            {
+                @*discounted price*@
+                <div class="product-price discounted-price">
+                    <span>@T("Products.Price.WithDiscount"):</span>
+                    <span class="price-value-@(Model.ProductId)">
+                        @Html.Raw(Model.PriceWithDiscount)
+                    </span>
+                </div>
+            }
+            if (!string.IsNullOrEmpty(Model.BasePricePAngV))
+            {
+                <div class="base-price-pangv" id="base-price-pangv-@Model.ProductId">
+                    @Model.BasePricePAngV
+                </div>
+            }
+            if (showVatNote)
+            {
+                <div class="ft-vat-note ft-vat-note--pdp">@(pricesIncludeTax ? "inc. VAT" : "excl. VAT")</div>
+            }
+            @* Reserved BNPL badge slot (§2.3 / §4). UI placeholder only — the actual Klarna/Clearpay
+               plugin wiring is separate, later work. Kept as a clearly-marked empty slot so the layout
+               already reserves the space near the price. *@
+            <div class="ft-bnpl-slot" data-ft-bnpl-slot>
+                <span class="ft-bnpl-slot__placeholder">
+                    Pay in 3 with Klarna / Clearpay
+                    <span class="ft-placeholder-tag">[BNPL badge slot &mdash; plugin not wired yet]</span>
+                </span>
+            </div>
+            if (Model.DisplayTaxShippingInfo)
+            {
+                var inclTax = await workContext.GetTaxDisplayTypeAsync() == TaxDisplayType.IncludingTax;
+                //tax info is already included in the price (incl/excl tax). that's why we display only shipping info here
+                //of course, you can modify appropriate locales to include VAT info there
+                <div class="tax-shipping-info">
+                    @T(inclTax ? "Products.Price.TaxShipping.InclTax" : "Products.Price.TaxShipping.ExclTax", await NopUrl.RouteTopicUrlAsync("shippinginfo"))
+                </div>
+            }
+        }
+    </div>
+}

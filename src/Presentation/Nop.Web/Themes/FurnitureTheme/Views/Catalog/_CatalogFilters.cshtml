@@ -1,0 +1,50 @@
+@model CatalogProductsModel
+
+@if (!Model.PriceRangeFilter.Enabled &&
+     !Model.SpecificationFilter.Enabled &&
+     !Model.ManufacturerFilter.Enabled)
+{
+    return;
+}
+
+@*
+    Desktop: this renders as the left-hand sidebar (inside _ColumnsTwo's <aside class="side-2">).
+    Mobile/tablet (< 992px): .ft-filters becomes a fixed bottom-sheet drawer, toggled open by the
+    trigger button below and closed via the backdrop, the close (x), or "Show results". All driven
+    by nopCommerce's real PriceRangeFilter / SpecificationFilter / ManufacturerFilter data — same
+    models the base theme uses — only the presentation changes.
+*@
+<button type="button" class="ft-filters-trigger" data-ft-filters-open aria-haspopup="true" aria-controls="ft-filters-panel">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4" stroke-linecap="round"/></svg>
+    @* No generic "Filters" locale resource exists in nopCommerce and adding one is a data/DB change outside theme scope, so this label is a plain literal for now. *@
+    <span>Filters</span>
+</button>
+
+<div class="ft-filter-backdrop" data-ft-filters-dismiss></div>
+
+<section class="block product-filters ft-filters" id="ft-filters-panel">
+    <div class="ft-filters__header">
+        <h2 class="ft-filters__title">Filters</h2>
+        <button type="button" class="ft-filters__close" data-ft-filters-dismiss aria-label="@T("Common.Close")">&times;</button>
+    </div>
+    <div class="ft-filters__body">
+        @if (Model.PriceRangeFilter.Enabled)
+        {
+            @await Html.PartialAsync("_FilterPriceBox", Model.PriceRangeFilter)
+        }
+
+        @if (Model.SpecificationFilter.Enabled)
+        {
+            @await Html.PartialAsync("_FilterSpecsBox", Model.SpecificationFilter)
+        }
+
+        @if (Model.ManufacturerFilter.Enabled)
+        {
+            @await Html.PartialAsync("_FilterManufacturerBox", Model.ManufacturerFilter)
+        }
+    </div>
+    <div class="ft-filters__footer">
+        @* "Common.Apply"/"Common.ShowResults" have no existing locale resource; literal text until one is added. *@
+        <button type="button" class="ft-btn ft-btn--primary ft-filters__apply" data-ft-filters-dismiss>Show results</button>
+    </div>
+</section>

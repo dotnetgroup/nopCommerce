@@ -1,0 +1,139 @@
+@using Nop.Core.Domain.Catalog
+@using Nop.Services.Localization
+@using Nop.Core
+@using Nop.Web.Factories
+@inject ILocalizationService localizationService
+@inject IStoreContext storeContext
+@inject ICatalogModelFactory catalogModelFactory
+
+@{
+    Layout = "_ColumnsOne";
+
+    var homepageTitle = await localizationService.GetLocalizedAsync(await storeContext.GetCurrentStoreAsync(), s => s.HomepageTitle);
+
+    //title
+    if (!string.IsNullOrEmpty(homepageTitle))
+    {
+        NopHtml.AddTitleParts(homepageTitle);
+    }
+
+    var homepageDescription = await localizationService.GetLocalizedAsync(await storeContext.GetCurrentStoreAsync(), s => s.HomepageDescription);
+
+    //meta
+    if (!string.IsNullOrEmpty(homepageDescription))
+    {
+        NopHtml.AddMetaDescriptionParts(homepageDescription);
+    }
+
+    //page class
+    NopHtml.AppendPageCssClassParts("html-home-page");
+
+    //top-level store categories, straight from the same factory the base theme uses for its homepage category grid
+    var topCategories = await catalogModelFactory.PrepareHomepageCategoryModelsAsync();
+}
+<div class="page home-page ft-home-page">
+    <div class="page-body">
+        @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.HomepageTop })
+        @await Component.InvokeAsync(typeof(TopicBlockViewComponent), new { systemName = "HomepageText" })
+
+        <section class="ft-hero">
+            <div class="ft-hero__inner">
+                <p class="ft-hero__eyebrow">New season</p>
+                <h1 class="ft-hero__headline">Furniture that feels like home</h1>
+                <p class="ft-hero__subhead">
+                    Warm, considered pieces for living rooms, dining spaces and everywhere in between.
+                    <span class="ft-placeholder-tag">[hero image placeholder &mdash; lifestyle photography to come]</span>
+                </p>
+                <a class="ft-btn ft-btn--primary" href="#">Shop the collection</a>
+            </div>
+        </section>
+
+        @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.HomepageBeforeCategories })
+
+        @if (topCategories.Any())
+        {
+            <section class="ft-categories">
+                <div class="ft-section-header">
+                    <h2>Shop by category</h2>
+                </div>
+                <div class="ft-categories__scroller">
+                    @foreach (var category in topCategories)
+                    {
+                        <a class="ft-category-tile"
+                           href="@(await NopUrl.RouteGenericUrlAsync<Category>(new { SeName = category.SeName }))"
+                           title="@category.PictureModel.Title">
+                            <span class="ft-category-tile__image">
+                                <img src="@category.PictureModel.ImageUrl" alt="@category.PictureModel.AlternateText" loading="lazy" />
+                            </span>
+                            <span class="ft-category-tile__label">@category.Name</span>
+                        </a>
+                    }
+                </div>
+            </section>
+        }
+
+        @await Component.InvokeAsync(typeof(FilterLevelValueSearchViewComponent))
+
+        @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.HomepageBeforeProducts })
+
+        <section class="ft-featured">
+            <div class="ft-carousel" data-ft-carousel>
+                @await Component.InvokeAsync(typeof(HomepageProductsViewComponent))
+                <div class="ft-carousel__nav">
+                    <button type="button" class="ft-carousel__btn ft-carousel__btn--prev" data-ft-carousel-prev aria-label="Scroll to previous products">&#8249;</button>
+                    <button type="button" class="ft-carousel__btn ft-carousel__btn--next" data-ft-carousel-next aria-label="Scroll to next products">&#8250;</button>
+                </div>
+            </div>
+        </section>
+
+        @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.HomepageBeforeBestSellers })
+        @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.HomepageBottom })
+
+        <section class="ft-trust">
+            <ul class="ft-trust__list">
+                <li class="ft-trust__item">
+                    <span class="ft-trust__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 3h13v13H1zM14 8h4l4 4v4h-8V8zM5 20a2 2 0 100-4 2 2 0 000 4zM18 20a2 2 0 100-4 2 2 0 000 4z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    <span class="ft-trust__text">
+                        <strong>Free delivery</strong>
+                        On orders over &pound;499 <span class="ft-placeholder-tag">[placeholder]</span>
+                    </span>
+                </li>
+                <li class="ft-trust__item">
+                    <span class="ft-trust__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8M3 3v5h5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    <span class="ft-trust__text">
+                        <strong>14-day returns</strong>
+                        Change of mind? No problem
+                    </span>
+                </li>
+                <li class="ft-trust__item">
+                    <span class="ft-trust__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    <span class="ft-trust__text">
+                        <strong>Secure payment</strong>
+                        All major cards &amp; PayPal
+                    </span>
+                </li>
+                <li class="ft-trust__item">
+                    <span class="ft-trust__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    <span class="ft-trust__text">
+                        <strong>4.8 / 5 rating</strong>
+                        From 1,200+ reviews <span class="ft-placeholder-tag">[placeholder]</span>
+                    </span>
+                </li>
+            </ul>
+        </section>
+
+        <section class="ft-newsletter">
+            <div class="ft-newsletter__inner">
+                @await Component.InvokeAsync(typeof(NewsLetterBoxViewComponent))
+            </div>
+        </section>
+    </div>
+</div>

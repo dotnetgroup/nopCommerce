@@ -1,0 +1,47 @@
+@model int
+@*
+    Reusable "swatch preview dots" component (spec §3.2 — swatch-based variant selector family).
+    Takes a product id and shows a read-only preview of that product's colour options, driven
+    entirely by nopCommerce's existing specification-attribute data (SpecificationAttributeOption.ColorSquaresRgb) —
+    the same field the base theme's catalog "colour squares" filter already uses. No new data model.
+    Used on the product card (category grid, homepage carousel, related/cross-sell, etc.) so any
+    product with colour-square specification values automatically gets swatch dots, anywhere the
+    card is rendered.
+*@
+@using Nop.Core.Domain.Catalog
+@using Nop.Services.Catalog
+@using Nop.Services.Localization
+@inject ISpecificationAttributeService specificationAttributeService
+@inject ILocalizationService localizationService
+
+@{
+    const int maxDotsToShow = 5;
+
+    var productSpecAttributes = await specificationAttributeService.GetProductSpecificationAttributesAsync(Model, showOnProductPage: true);
+
+    var swatches = new List<(string Rgb, string Name)>();
+    foreach (var psa in productSpecAttributes)
+    {
+        if (psa.AttributeType != SpecificationAttributeType.Option)
+            continue;
+
+        var option = await specificationAttributeService.GetSpecificationAttributeOptionByIdAsync(psa.SpecificationAttributeOptionId);
+        if (string.IsNullOrEmpty(option?.ColorSquaresRgb))
+            continue;
+
+        swatches.Add((option.ColorSquaresRgb, await localizationService.GetLocalizedAsync(option, x => x.Name)));
+    }
+}
+@if (swatches.Any())
+{
+    <div class="ft-swatch-dots">
+        @foreach (var swatch in swatches.Take(maxDotsToShow))
+        {
+            <span class="ft-swatch-dots__dot" style="background-color: @(swatch.Rgb);" title="@swatch.Name"></span>
+        }
+        @if (swatches.Count > maxDotsToShow)
+        {
+            <span class="ft-swatch-dots__more">+@(swatches.Count - maxDotsToShow)</span>
+        }
+    </div>
+}

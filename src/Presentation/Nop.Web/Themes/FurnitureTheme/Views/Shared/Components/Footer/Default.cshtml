@@ -1,0 +1,95 @@
+@model FooterModel
+
+@using Nop.Core
+@using Nop.Core.Domain.Tax
+@using Nop.Core.Domain.Topics
+
+@inject IWorkContext workContext
+
+@{
+    //sitewide VAT-inclusive statement (spec §4). Follows the store's real tax display setting.
+    var pricesIncludeTax = await workContext.GetTaxDisplayTypeAsync() == TaxDisplayType.IncludingTax;
+}
+<footer class="footer ft-footer">
+    <section class="footer-upper">
+        @await Component.InvokeAsync(typeof(FooterMenuViewComponent))
+        <div class="footer-block follow-us">
+            <div class="social">
+                <h2 class="title">
+                    @T("Footer.FollowUs")
+                </h2>
+                @await Component.InvokeAsync(typeof(SocialButtonsViewComponent))
+            </div>
+            @await Component.InvokeAsync(typeof(NewsLetterBoxViewComponent))
+        </div>
+    </section>
+
+    @* UK company / VAT registration details (spec §2.5 & §4). These are placeholder values — the
+       merchant replaces them with real registration details (or wires them to the admin "Footer
+       custom HTML" setting later). Kept in the theme layout so the compliance fields always render. *@
+    <section class="footer-compliance ft-footer-compliance">
+        <div class="ft-footer-compliance__item">
+            <span class="ft-footer-compliance__label">Company registration no.</span>
+            <span class="ft-footer-compliance__value">12345678 <span class="ft-placeholder-tag">[placeholder]</span></span>
+        </div>
+        <div class="ft-footer-compliance__item">
+            <span class="ft-footer-compliance__label">VAT registration no.</span>
+            <span class="ft-footer-compliance__value">GB 123 4567 89 <span class="ft-placeholder-tag">[placeholder]</span></span>
+        </div>
+        <div class="ft-footer-compliance__item">
+            <span class="ft-footer-compliance__label">Registered office</span>
+            <span class="ft-footer-compliance__value">@Model.StoreName, United Kingdom <span class="ft-placeholder-tag">[placeholder]</span></span>
+        </div>
+        <div class="ft-footer-compliance__item">
+            <span class="ft-footer-compliance__value ft-footer-compliance__vat">
+                @if (pricesIncludeTax)
+                {
+                    <text>All prices include VAT where applicable.</text>
+                }
+                else
+                {
+                    <text>All prices exclude VAT; VAT is added at checkout.</text>
+                }
+            </span>
+        </div>
+    </section>
+
+    <section class="footer-lower">
+        <div class="footer-info">
+            <span class="footer-disclaimer">@T("Content.CopyrightNotice", DateTime.Now.Year, Model.StoreName)</span>
+            @if (Model.DisplayTaxShippingInfoFooter)
+            {
+                var inclTax = await workContext.GetTaxDisplayTypeAsync() == TaxDisplayType.IncludingTax;
+                <span class="footer-tax-shipping">
+                    @T(inclTax ? "Footer.TaxShipping.InclTax" : "Footer.TaxShipping.ExclTax", await NopUrl.RouteTopicUrlAsync("shippinginfo"))
+                </span>
+            }
+        </div>
+        @if (!Model.HidePoweredByNopCommerce)
+        {
+            <div class="footer-powered-by">
+                @*Would you like to remove the "Powered by nopCommerce" link in the bottom of the footer?
+                    Please find more info at https://www.nopcommerce.com/nopcommerce-copyright-removal-key*@
+                Powered by <a href="@(OfficialSite.Main)" target="_blank" @(Model.IsHomePage ? string.Empty : "rel=nofollow")>nopCommerce</a>
+            </div>
+        }
+        @await Component.InvokeAsync(typeof(StoreThemeSelectorViewComponent))
+    </section>
+    @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.Footer, additionalData = Model })
+</footer>
+
+<script asp-location="Footer">
+    $(function() {
+        $('.block .title').on('click', function () {
+            var e = window, a = 'inner';
+            if (!('innerWidth' in window)) {
+                a = 'client';
+                e = document.documentElement || document.body;
+            }
+            var result = { width: e[a + 'Width'], height: e[a + 'Height'] };
+            if (result.width < 1001) {
+                $(this).siblings('.listbox').slideToggle('slow');
+            }
+        });
+    });
+</script>

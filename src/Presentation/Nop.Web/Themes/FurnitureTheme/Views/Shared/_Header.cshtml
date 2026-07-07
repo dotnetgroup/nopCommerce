@@ -1,0 +1,53 @@
+@*
+    Header override (spec §2.5). The desktop header markup is identical to the base theme — logo,
+    selectors, account/links, flyout basket (with its item count), search — all the same components,
+    just restyled via CSS. The ONLY structural addition is the mobile bottom navigation bar below,
+    which is hidden on desktop (≥992px) via CSS. It links to existing routes only; no new logic.
+*@
+<header class="header">
+    <a class="skip" href="#main">@T("Header.SkipNavigation.Text")</a>
+    @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.HeaderBefore })
+    <div class="header-upper">
+        <div class="header-selectors-wrapper">
+            @await Component.InvokeAsync(typeof(TaxTypeSelectorViewComponent))
+            @await Component.InvokeAsync(typeof(CurrencySelectorViewComponent))
+            @await Component.InvokeAsync(typeof(LanguageSelectorViewComponent))
+            @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.HeaderSelectors })
+        </div>
+        <div class="header-links-wrapper">
+            @await Component.InvokeAsync(typeof(HeaderLinksViewComponent))
+            @await Component.InvokeAsync(typeof(FlyoutShoppingCartViewComponent))
+        </div>
+    </div>
+    @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.HeaderMiddle })
+    <div class="header-lower">
+        <div class="header-logo">
+            @await Component.InvokeAsync(typeof(LogoViewComponent))
+        </div>
+        <div role="search" class="search-box store-search-box">
+            @await Component.InvokeAsync(typeof(SearchBoxViewComponent))
+        </div>
+    </div>
+    @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.HeaderAfter })
+</header>
+
+@* Mobile bottom navigation (spec §2.5 — "collapses to hamburger + bottom nav on mobile").
+   Hidden on desktop via CSS. All targets are existing nopCommerce routes. *@
+<nav class="ft-bottom-nav" aria-label="Primary mobile navigation">
+    <a class="ft-bottom-nav__item" href="@Url.RouteUrl(NopRouteNames.General.HOMEPAGE)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 11l9-7 9 7M5 10v10h5v-6h4v6h5V10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>@T("Categories.Breadcrumb.Top")</span>
+    </a>
+    <a class="ft-bottom-nav__item" href="@Url.RouteUrl(NopRouteNames.General.SEARCH)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/></svg>
+        <span>@T("Search")</span>
+    </a>
+    <a class="ft-bottom-nav__item" href="@Url.RouteUrl(NopRouteNames.General.CUSTOMER_INFO)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6" stroke-linecap="round"/></svg>
+        <span>@T("Account.MyAccount")</span>
+    </a>
+    <a class="ft-bottom-nav__item" href="@Url.RouteUrl(NopRouteNames.General.CART)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 4h2l2.5 12h10l2-8H6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.3" fill="currentColor" stroke="none"/><circle cx="17" cy="20" r="1.3" fill="currentColor" stroke="none"/></svg>
+        <span>@T("ShoppingCart")</span>
+    </a>
+</nav>

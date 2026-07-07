@@ -1,0 +1,16 @@
+@*
+    Delivery-estimate note for the cart (spec §2.4 — "delivery date estimator visible in cart").
+    This is a themed, informational block placed alongside nopCommerce's existing "estimate shipping"
+    tool (which stays fully functional in the cart options). Copy is placeholder until real delivery
+    windows/lead times are confirmed — it does not compute or change any shipping/pricing logic.
+*@
+<div class="ft-delivery-estimate" role="note">
+    <span class="ft-delivery-estimate__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 3h13v13H1zM14 8h4l4 4v4h-8V8zM5 20a2 2 0 100-4 2 2 0 000 4zM18 20a2 2 0 100-4 2 2 0 000 4z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </span>
+    <span class="ft-delivery-estimate__text">
+        <strong>Estimated delivery: 2&ndash;4 weeks.</strong>
+        Use <em>Estimate shipping</em> below for a delivery cost to your postcode.
+        <span class="ft-placeholder-tag">[delivery-window copy placeholder]</span>
+    </span>
+</div>
