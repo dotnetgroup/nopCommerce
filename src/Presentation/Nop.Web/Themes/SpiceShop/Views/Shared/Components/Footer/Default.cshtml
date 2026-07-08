@@ -1,0 +1,119 @@
+﻿@model FooterModel
+
+@using Nop.Core
+@using Nop.Core.Domain.Tax
+@using Nop.Core.Domain.Topics
+@using Nop.Services.Configuration;
+@using Nop.Services.Localization
+@using Nop.Services.Media;
+@using Nop.Services.Themes
+
+@inject IWorkContext workContext
+@inject ILocalizationService localizationService
+@inject IPictureService pictureService
+@inject IStoreContext storeContext
+@inject ISettingService settingService
+@inject IThemeContext themeContext
+
+@{
+    var themeName = await themeContext.GetWorkingThemeNameAsync();
+    var language = await workContext.GetWorkingLanguageAsync();
+    var store = await storeContext.GetCurrentStoreAsync();
+    var storeName = await localizationService.GetLocalizedAsync(store, s => s.Name);
+
+    var columns = 1;
+    var hideDesignedByNopStation = await settingService.GetSettingByKeyAsync<bool>(
+        "SpiceShopSettings.HideDesignedByNopStationAtFooter", storeId: store.Id,loadSharedValueIfNotFound: true);
+
+    var showSupportedCards = await settingService.GetSettingByKeyAsync<bool>(
+        "SpiceShopSettings.ShowSupportedCardsAtFooter", storeId: store.Id, loadSharedValueIfNotFound: true);
+
+    var supportedCardsImageUrl = "";
+    var pictureId = 0;
+
+    if (hideDesignedByNopStation)
+    {
+        columns++;
+    }
+
+    if (showSupportedCards)
+    {
+        columns++;
+
+        pictureId = await settingService.GetSettingByKeyAsync<int>("SpiceShopSettings.FooterSupportedCardsPictureId",
+            storeId: store.Id,
+            loadSharedValueIfNotFound: true
+        );
+
+        supportedCardsImageUrl = await pictureService.GetPictureUrlAsync(pictureId);
+    }
+
+    if (!Model.HidePoweredByNopCommerce)
+        columns++;
+}
+
+<footer class="footer">
+    <section class="footer-upper">
+
+        @await Component.InvokeAsync(typeof(FooterMenuViewComponent))
+        <div class="footer-block follow-us">
+            <div class="social">
+                <h2 class="title">
+                    @T("Footer.FollowUs")
+                </h2>
+                @await Component.InvokeAsync(typeof(SocialButtonsViewComponent))
+            </div>
+            @await Component.InvokeAsync(typeof(NewsLetterBoxViewComponent))
+            <div class="payment-method">
+                <h2 class="title">
+                    @T("NopStation.Theme.SpiceShop.FooterSupportedCards.Title")
+                </h2>
+                @if (showSupportedCards)
+                {
+                    <div class="payment-methods">
+                        <img class="payment-method-image" src="@supportedCardsImageUrl" alt="Payment methods" title="Payment methods" />
+                    </div>
+                }
+            </div>
+        </div>
+
+
+    </section>
+
+    <section class="footer-lower">
+        @if (!Model.HidePoweredByNopCommerce)
+        {
+            <div class="footer-powered-by">
+                Powered by <a href="@(OfficialSite.Main)" target="_blank" @(Model.IsHomePage ? string.Empty : "rel=nofollow")>nopCommerce</a>
+            </div>
+        }
+
+        @if (!hideDesignedByNopStation)
+        {
+            <div class="footer-powered-by">
+                Designed By <img class="nopstation-logo" alt="Designed by nopStation : Your Trusted #1 nopCommerce Development Services Company" title="Designed by nopStation" src="/Themes/SpiceShop/Content/images/designed-by-nopstation.png" width="98" height="22">
+
+                <div class="seo-text">Your Trusted #1 <a href="https://www.nop-station.com">nopCommerce Development Services</a> Company </div>
+            </div>
+        }
+
+        <div class="footer-info">
+            <span class="footer-disclaimer">@T("Content.CopyrightNotice", DateTime.Now.Year, Model.StoreName)</span>
+            @if (Model.DisplayTaxShippingInfoFooter)
+            {
+                var inclTax = await workContext.GetTaxDisplayTypeAsync() == TaxDisplayType.IncludingTax;
+                <span class="footer-tax-shipping">
+                    @T(inclTax ? "Footer.TaxShipping.InclTax" : "Footer.TaxShipping.ExclTax", await NopUrl.RouteTopicUrlAsync("shippinginfo"))
+                </span>
+            }
+        </div>
+
+        @await Component.InvokeAsync(typeof(StoreThemeSelectorViewComponent))
+    </section>
+
+    @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.Footer, additionalData = Model })
+</footer>
+
+<script asp-location="Footer">
+    mainMenu.init('.footer-navigation .footer-menu__toggle', 'footer-menu--active');
+</script>
