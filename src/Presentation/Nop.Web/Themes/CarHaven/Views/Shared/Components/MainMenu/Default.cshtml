@@ -1,0 +1,73 @@
+@model MenuModel
+
+@functions {
+    async Task RenderMenuItem(MenuItemModel menuItem, int level = 0)
+    {
+        var levelClass = level == 0 ? "first-level" : string.Empty;
+        var url = string.IsNullOrEmpty(menuItem.Url) ? "#" : menuItem.Url;
+        <li>
+            <a href="@url">@menuItem.Title</a>
+            @{
+                var hasChildren = menuItem.ChildrenItems.Any();
+            }
+            @if (hasChildren)
+            {
+                <div class="sublist-toggle"></div>
+                <ul class="sublist @levelClass">
+                    <li class="parent-links">
+                        <a href="@url">@menuItem.Title</a>
+                        <button type="button" class="close-sublist">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </li>
+                    @foreach (var child in menuItem.ChildrenItems)
+                    {
+                        await RenderMenuItem(child, level + 1);
+                    }
+                </ul>
+            }
+        </li>
+    }
+}
+
+<ul class="top-menu notmobile">
+    @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.HeaderMenuBefore, additionalData = Model })
+    @foreach (var menuItem in Model.Items)
+    {
+        await RenderMenuItem(menuItem);
+    }
+    @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.HeaderMenuAfter, additionalData = Model })
+</ul>
+
+<ul class="top-menu mobile">
+    @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.MobHeaderMenuBefore, additionalData = Model })
+    @foreach (var menuItem in Model.Items)
+    {
+        await RenderMenuItem(menuItem);
+    }
+    @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.MobHeaderMenuAfter, additionalData = Model })
+</ul>
+
+<script asp-location="Footer">
+    $(function() {
+        $('.header-menu-toggle').on('click', function () {
+            $('.header-menu').toggleClass('show');
+        });
+        $('.header-menu-toggle').on('keydown', function (event) {
+            if (event.keyCode === 13 || event.keyCode === 32) {
+                event.preventDefault();
+                $('.header-menu').toggleClass('show');
+            }
+        });
+        $('.close-header-menu').on('click', function () {
+            $('.header-menu').removeClass('show');
+        });
+        $(document).on("click", ".top-menu .sublist-toggle", function () {
+            $(this).siblings('.sublist').toggleClass('active');
+        });
+        $(document).on("click", ".close-sublist", function () {
+            $(this).closest(".sublist").removeClass("active");
+        });
+    });
+</script>
+

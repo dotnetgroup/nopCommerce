@@ -1,8 +1,8 @@
-@model ProductDetailsModel
+﻿@model ProductDetailsModel
 
+@using Nop.Core
 @using Nop.Core.Domain.Catalog
 @using Nop.Core.Domain.Seo
-@using Nop.Services.Helpers
 @using Nop.Services.Html
 
 @inject IHtmlFormatter htmlFormatter
@@ -49,12 +49,8 @@
         NopHtml.AddHeadCustomParts("<meta property=\"twitter:image\" content=\"" + Model.DefaultPictureModel.ImageUrl + "\" />");
         NopHtml.AddHeadCustomParts("<meta property=\"twitter:url\" content=\"" + webHelper.GetThisPageUrl(false) + "\" />");
     }
-
+    
     NopHtml.AddJsonLdParts(Model.JsonLd);
-
-    //show the sticky mobile "add to basket" bar only when the product is actually buyable with a price
-    var showStickyBar = !Model.ProductPrice.CustomerEntersPrice && !Model.ProductPrice.CallForPrice && !Model.AddToCart.DisableBuyButton;
-    var stickyPrice = !string.IsNullOrWhiteSpace(Model.ProductPrice.PriceWithDiscount) ? Model.ProductPrice.PriceWithDiscount : Model.ProductPrice.Price;
 }
 <!--product breadcrumb-->
 @section Breadcrumb
@@ -62,11 +58,11 @@
     @await Html.PartialAsync("_ProductBreadcrumb", Model.Breadcrumb)
 }
 @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.ProductDetailsAfterBreadcrumb, additionalData = Model })
-<div class="page product-details-page ft-pdp">
+<div class="page product-details-page">
     <div class="page-body">
         @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.ProductDetailsTop, additionalData = Model })
         <form asp-route="Product" asp-route-sename="@Model.SeName" method="post" id="product-details-form">
-            <article data-productid="@Model.Id">
+            <div data-productid="@Model.Id">
                 <div class="product-essential">
                     @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.ProductDetailsEssentialTop, additionalData = Model })
                     <div class="gallery">
@@ -129,9 +125,19 @@
 
                             @await Html.PartialAsync("_ProductTierPrices", Model.TierPrices)
 
-                            var dataDictAddToCart = new ViewDataDictionary(ViewData);
-                            dataDictAddToCart.TemplateInfo.HtmlFieldPrefix = $"addtocart_{Model.Id}";
-                            @await Html.PartialAsync("_AddToCart", Model.AddToCart, dataDictAddToCart)
+                            @if (!string.IsNullOrEmpty(Model.AddToCart.MinimumQuantityNotification))
+                            {
+                                <div class="min-qty-notification">@Model.AddToCart.MinimumQuantityNotification</div>
+                            }
+                            <div class="cart-compare-wrap">
+                               @{
+                                    var dataDictAddToCart = new ViewDataDictionary(ViewData);
+                                    dataDictAddToCart.TemplateInfo.HtmlFieldPrefix = $"addtocart_{Model.Id}";
+                               }
+                                @await Html.PartialAsync("_AddToCart", Model.AddToCart, dataDictAddToCart)
+
+                                @await Html.PartialAsync("_CompareProductsButton", Model)
+                            </div>
 
                             @await Html.PartialAsync("_ProductEstimateShipping", Model.ProductEstimateShipping)
                         }
@@ -143,7 +149,6 @@
                                 dataDictAddToWishlist.TemplateInfo.HtmlFieldPrefix = $"addtocart_{Model.Id}";
                                 @await Html.PartialAsync("_AddToWishlist", Model.AddToCart, dataDictAddToWishlist)
                             }
-                            @await Html.PartialAsync("_CompareProductsButton", Model)
                             @await Html.PartialAsync("_ProductEmailAFriendButton", Model)
                             @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.ProductDetailsInsideOverviewButtonsAfter, additionalData = Model })
                         </div>
@@ -159,19 +164,13 @@
                     @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.ProductDetailsEssentialBottom, additionalData = Model })
                 </div>
                 @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.ProductDetailsBeforeCollateral, additionalData = Model })
-                <section class="product-collateral">
-                    <!--dimension / scale block (reusable, data-driven from spec attributes)-->
-                    @await Html.PartialAsync("_ProductDimensions", Model.ProductSpecificationModel)
-                    <!--full spec table-->
+                <div class="product-collateral">
                     @await Html.PartialAsync("_ProductSpecifications", Model.ProductSpecificationModel)
-                    <!--conditional UK fire-safety / compliance block (only shows where applicable)-->
-                    @await Html.PartialAsync("_ComplianceBlock", Model.ProductSpecificationModel)
                     @await Html.PartialAsync("_ProductTags", Model.ProductTags)
-                </section>
+                </div>
                 @await Component.InvokeAsync(typeof(ProductsAlsoPurchasedViewComponent), new { productId = Model.Id })
                 @await Component.InvokeAsync(typeof(RelatedProductsViewComponent), new { productId = Model.Id })
-                @await Component.InvokeAsync(typeof(CompatibleWithFilterLevelValuesViewComponent), new { productId = Model.Id })
-            </article>
+            </div>
         </form>
         <!--product reviews-->
         @if (Model.ProductReviewOverview.AllowCustomerReviews)
@@ -181,19 +180,3 @@
         @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.ProductDetailsBottom, additionalData = Model })
     </div>
 </div>
-@if (showStickyBar)
-{
-    @* Sticky mobile Add-to-Basket bar (§2.3). Shown only < 992px via CSS. It does not duplicate any
-       cart logic — its button just re-triggers the real add-to-cart button already rendered by
-       _AddToCart, and the price span carries the price-value-{id} class so the existing attribute-change
-       AJAX keeps it in sync with the main price. *@
-    <div class="ft-sticky-bar" data-ft-sticky-bar aria-hidden="true">
-        <div class="ft-sticky-bar__info">
-            <span class="ft-sticky-bar__name">@Model.Name</span>
-            <span class="ft-sticky-bar__price price-value-@Model.Id">@Html.Raw(stickyPrice)</span>
-        </div>
-        <button type="button" class="button-1 ft-sticky-bar__button" data-ft-sticky-add="add-to-cart-button-@Model.Id">
-            @T("ShoppingCart.AddToCart")
-        </button>
-    </div>
-}

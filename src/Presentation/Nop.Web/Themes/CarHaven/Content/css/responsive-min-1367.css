@@ -1,0 +1,167 @@
+﻿
+@media all and (min-width: 1367px) {
+:root {
+    --layout-outer-width : 1300px;
+}
+
+  /*** GLOBAL STYLES ***/
+
+
+  html:not(.html-home-page) .master-wrapper-content,
+  .html-home-page .topic-block,
+  .html-home-page .home-page-category-grid,
+  .html-home-page .news-list-homepage,
+  .html-home-page .home-page-polls,
+  .html-home-page .home-page-product-grid {
+    width: var(--layout-outer-width);
+  }
+
+  .inputs label {
+    width: 430px;
+  }
+
+  .center-2 .inputs label {
+    width: 213px;
+  }
+
+  .inputs.accept-consent label {
+    width: auto;
+  }
+
+
+  /*** HEADER ***/
+
+
+  .header .header-upper {
+    width: var(--layout-outer-width);
+  }
+
+
+  /*** NAVIGATION ***/
+
+
+  .header-menu .top-menu {
+    width: var(--layout-outer-width);
+  }
+
+    .header-menu > ul > li {
+      padding: 0 20px;
+    }
+
+      .header-menu > ul > li > a,
+      .header-menu > ul > li > span {
+        font-size: 18px;
+      }
+
+
+  /*** FOOTER ***/
+
+
+  .footer-upper {
+    width: var(--layout-outer-width);
+    padding: 35px 30px;
+  }
+
+
+  .footer-lower {
+    width: var(--layout-outer-width);
+    padding: 25px 20px;
+  }
+
+
+  /*** PRODUCT REVIEWS ***/
+
+
+  .product-review-item .review-title {
+    max-width: 1050px;
+  }
+
+  .write-review .review-rating div.name-description {
+    margin: 0 5px 0 0;
+    min-width: 430px;
+  }
+
+
+  /*** REGISTRATION, LOGIN, ACCOUNT ***/
+
+
+  .login-page .returning-wrapper input[type="text"],
+  .login-page .returning-wrapper input[type="email"],
+  .login-page .returning-wrapper input[type="password"] {
+    width: 360px;
+  }
+
+  .registration-page .vat-note {
+    margin-left: 385px;
+  }
+
+  .customer-info-page .vat-note,
+  .customer-info-page .vat-status,
+  .customer-info-page .email-to-revalidate-note {
+    margin-left: 225px;
+  }
+
+  /*** SHOPPING CART ***/
+
+
+  .cart-footer .totals {
+    width: 395px;
+    margin: 0;
+  }
+
+  .cart-footer .cart-collaterals {
+    width: 760px;
+    margin: 0;
+  }
+
+    .cart-footer .cart-collaterals .deals {
+      float: left;
+      width: 360px;
+    }
+
+    .cart-footer .cart-collaterals .shipping {
+      float: right;
+      width: 360px;
+    }
+
+  .cart-footer .estimate-shipping .inputs label {
+    display: inline-block;
+    width: 35%;
+  }
+
+  .cart-footer .estimate-shipping .inputs input,
+  .cart-footer .estimate-shipping .inputs select {
+    width: 65%;
+  }
+
+
+  /*** CHECKOUT ***/
+
+
+  .shipping-method .method-list li,
+  .payment-method .method-list li {
+    margin: 20px 1%;
+  }
+
+  .payment-info .info td:first-child {
+    width: 375px !important;
+  }
+
+  .payment-info .info td:only-child {
+    width: 100% !important;
+  }
+
+
+  /*** FORUM & PROFILE ***/
+
+
+  .forum-actions .pager,
+  .topic-actions .pager {
+    max-width: 600px !important;
+  }
+
+  .topic-post .post-text {
+    width: 930px;
+    max-width: 100%;
+  }
+}

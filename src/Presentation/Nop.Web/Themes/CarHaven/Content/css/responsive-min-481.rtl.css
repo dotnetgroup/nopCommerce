@@ -1,0 +1,191 @@
+﻿
+@media all and (min-width: 481px) {
+  :root {
+    --layout-outer-width: 92%;
+  }
+
+  /*** GLOBAL ***/
+
+
+  html:not(.html-home-page) .master-wrapper-content,
+  .html-home-page .topic-block,
+  .html-home-page .home-page-category-grid,
+  .html-home-page .news-list-homepage,
+  .html-home-page .home-page-polls,
+  .html-home-page .home-page-product-grid {
+    width: var(--layout-outer-width);
+  }
+
+
+  /*** GLOBAL TABLES ***/
+
+
+  .cart tr {
+    width: 46%;
+    margin: 40px 2% 0;
+  }
+
+    .cart tr:nth-child(2n+1) {
+      clear: both;
+    }
+
+  .order-details-page .data-table tr {
+    width: 46%;
+    margin: 40px 2% 0;
+  }
+
+    .order-details-page .data-table tr:nth-child(2n+1) {
+      clear: both;
+    }
+
+
+  /*** HEADER ***/
+
+
+  .header-selectors-wrapper > div {
+    display: inline-block;
+    width: 30%;
+    margin: 10px auto;
+  }
+
+  .search-box input.search-box-text {
+    width: 280px;
+  }
+
+  .ui-autocomplete {
+    width: 280px !important;
+  }
+
+    .ui-autocomplete img {
+      display: inline;
+    }
+
+
+  /*** FOOTER ***/
+
+  .follow-us,
+  .footer-block {
+    width: 85%;
+  }
+
+  .newsletter-email input[type="text"] {
+    width: 240px;
+  }
+
+
+  /*** CATEGORY ***/
+
+
+  .item-box {
+    width: 48%;
+    margin: 0 1% 50px;
+  }
+
+    .item-box:nth-child(2n+1) {
+      clear: both;
+    }
+
+    .item-box .product-rating-box {
+      margin: 0 0 15px;
+    }
+
+    .item-box .prices {
+      min-height: 40px;
+    }
+
+    .item-box .product-title {
+      min-height: 52px;
+      font-size: 22px;
+      line-height: 1.2;
+    }
+
+
+  /*** PRODUCT PAGE ***/
+
+
+  .overview-buttons div {
+    display: inline-block;
+    width: auto;
+    margin: 0 1px 2px;
+  }
+
+
+  /*** WISHLIST ***/
+
+
+  .wishlist-content .button-2 {
+    display: inline-block;
+    width: auto;
+    min-width: 140px;
+    margin: 0 1px 5px;
+  }
+
+
+  /*** TOPICS ***/
+
+
+  .enter-password-form input[type="password"] {
+    width: 260px;
+  }
+
+
+  /*** FORUM & PROFILE ***/
+
+  .forums-header {
+    background-color: #f9f9f9;
+    padding: 30px 20px 20px;
+  }
+
+  .ui-tabs-nav li {
+    display: inline-block;
+    min-width: 150px;
+    margin: 0 5px -1px;
+    /*override jQuery UI styles, do not delete doubled properties*/
+    margin: 0 5px -1px !important;
+  }
+
+  .private-messages-page .buttons .button-1,
+  .private-messages-page .buttons .button-2,
+  .private-message-view-page .buttons .button-1,
+  .private-message-view-page .buttons .button-2 {
+    display: inline-block;
+    width: auto;
+    margin: 1px;
+  }
+
+  .topic-post .post-text {
+    float: right;
+    width: 90.5%;
+    text-align: right;
+  }
+
+  .forum-group .forum-table th.latest-post,
+  .forum-group .forum-table th.topics,
+  .forum-group .forum-table th.posts,
+  .forum-group .forum-table td.latest-post,
+  .forum-group .forum-table td.topics,
+  .forum-group .forum-table td.posts {
+    display: table-cell;
+  }
+
+  .topic-group .forum-table th.latest-post,
+  .topic-group .forum-table td.latest-post {
+    display: table-cell;
+  }
+
+  .forum-table td.image {
+    max-width: 40px;
+  }
+
+    .forum-table td.image div {
+      max-width: 100%;
+      background-size: contain;
+    }
+
+
+  /*** ESTIMATE SHIPPING POPUP ***/
+
+  .estimate-shipping-popup {
+    padding: 25px;
+  }
+}

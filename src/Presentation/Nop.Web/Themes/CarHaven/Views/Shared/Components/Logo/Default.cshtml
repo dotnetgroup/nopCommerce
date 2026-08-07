@@ -1,0 +1,32 @@
+﻿@model LogoModel
+
+@using Nop.Core
+@using Nop.Services.Configuration;
+@using Nop.Services.Localization
+@using Nop.Services.Media;
+@using Nop.Services.Themes
+
+@inject ILocalizationService localizationService
+@inject IPictureService pictureService
+@inject IStoreContext storeContext
+@inject ISettingService settingService
+@inject IThemeContext themeContext
+
+@{
+    var themeName = await themeContext.GetWorkingThemeNameAsync();
+    var store = await storeContext.GetCurrentStoreAsync();
+    var storeName = await localizationService.GetLocalizedAsync(store, s => s.Name);
+
+    var logoImageUrl = "";
+
+    var pictureId = await settingService.GetSettingByKeyAsync<int>("CarHavenSettings.HeaderLogoPictureId", storeId: store.Id, loadSharedValueIfNotFound: true);
+    var pictureUrl = await pictureService.GetPictureUrlAsync(pictureId);
+    if (!string.IsNullOrEmpty(pictureUrl))
+    {
+        logoImageUrl = pictureUrl;
+    }
+}
+
+<a href="@Url.RouteUrl("Homepage")">
+    <img title="" alt="@storeName" src="@logoImageUrl">
+</a>

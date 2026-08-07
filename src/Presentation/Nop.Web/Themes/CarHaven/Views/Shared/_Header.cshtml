@@ -1,0 +1,52 @@
+﻿@using Nop.Services.Configuration;
+
+<div class="header">
+    <a class="skip" href="#main">@T("Header.SkipNavigation.Text")</a>
+    @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.HeaderBefore })
+    <div class="header-upper">
+        <div class="header-logo">
+            <button type="button" class="header-menu-toggle" aria-label="menu toggle">
+                <i class="fa fa-bars"></i>
+            </button>
+            @await Component.InvokeAsync(typeof(LogoViewComponent))
+        </div>
+        <div class="search-box store-search-box">
+            @await Component.InvokeAsync(typeof(SearchBoxViewComponent))
+        </div>
+        <div class="header-selector-links-container">
+            <div class="header-selectors-wrapper">
+                @await Component.InvokeAsync(typeof(TaxTypeSelectorViewComponent))
+                @await Component.InvokeAsync(typeof(CurrencySelectorViewComponent))
+                @await Component.InvokeAsync(typeof(LanguageSelectorViewComponent))
+                @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.HeaderSelectors })
+            </div>
+            <div class="header-links-wrapper">
+                @await Component.InvokeAsync(typeof(HeaderLinksViewComponent))
+                @await Component.InvokeAsync(typeof(FlyoutShoppingCartViewComponent))
+            </div>
+        </div>
+        
+    </div>
+    @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.HeaderMiddle })
+   
+    @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.HeaderAfter })
+</div>
+
+<script asp-location="Footer">
+    $(document).ready(function () {
+        function moveSelectors() {
+            if ($(window).width() < 1000) {
+                $(".header-selector-links-container .header-selectors-wrapper").prependTo(".header-menu");
+            } else {
+                $(".header-menu .header-selectors-wrapper").prependTo(".header-selector-links-container");
+            }
+        }
+
+        moveSelectors(); // Run on page load
+
+        $(window).resize(function () {
+            moveSelectors(); // Run on window resize
+        });
+    });
+
+</script>

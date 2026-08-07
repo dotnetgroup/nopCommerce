@@ -1,0 +1,120 @@
+﻿@{
+    Layout = "_Root";
+}
+@{
+    //current category ID
+    var currentCategoryId = 0;
+    if (Url.ActionContext.RouteData.Values["controller"].ToString().Equals("catalog", StringComparison.InvariantCultureIgnoreCase) &&
+        Url.ActionContext.RouteData.Values["action"].ToString().Equals("category", StringComparison.InvariantCultureIgnoreCase))
+    {
+        currentCategoryId = Convert.ToInt32(Url.ActionContext.RouteData.Values["categoryId"].ToString());
+    }
+
+    //current manufacturer ID
+    var currentManufacturerId = 0;
+    if (Url.ActionContext.RouteData.Values["controller"].ToString().Equals("catalog", StringComparison.InvariantCultureIgnoreCase) &&
+        Url.ActionContext.RouteData.Values["action"].ToString().Equals("manufacturer", StringComparison.InvariantCultureIgnoreCase))
+    {
+        currentManufacturerId = Convert.ToInt32(Url.ActionContext.RouteData.Values["manufacturerId"].ToString());
+    }
+
+    //current product ID
+    var currentProductId = 0;
+    if (Url.ActionContext.RouteData.Values["controller"].ToString().Equals("product", StringComparison.InvariantCultureIgnoreCase) &&
+        Url.ActionContext.RouteData.Values["action"].ToString().Equals("productdetails", StringComparison.InvariantCultureIgnoreCase))
+    {
+        currentProductId = Convert.ToInt32(Url.ActionContext.RouteData.Values["productId"].ToString());
+    }
+}
+
+@await RenderSectionAsync("Breadcrumb", false)
+
+<div class="side-2">
+    @if (IsSectionDefined("left"))
+    {
+        @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.LeftSideColumnBefore })
+        @await RenderSectionAsync("left")
+        @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.LeftSideColumnAfter })
+    }
+    else
+    {
+        @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.LeftSideColumnBefore })
+        @await RenderSectionAsync("CatalogFilters", false);
+        @await Component.InvokeAsync(typeof(CategoryNavigationViewComponent), new { currentCategoryId = currentCategoryId, currentProductId = currentProductId })
+        @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.LeftSideColumnAfterCategoryNavigation })
+        @await Component.InvokeAsync(typeof(ManufacturerNavigationViewComponent), new { currentManufacturerId = currentManufacturerId })
+        @await Component.InvokeAsync(typeof(VendorNavigationViewComponent))
+        @await Component.InvokeAsync(typeof(RecentlyViewedProductsBlockViewComponent), new { productThumbPictureSize = 64 })
+        @await Component.InvokeAsync(typeof(PopularProductTagsViewComponent))
+        @await Component.InvokeAsync("PollBlock", new { systemKeyword = "LeftColumnPoll" })
+        @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.LeftSideColumnAfter })
+    }
+</div>
+<div class="center-2">
+    @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.MainColumnBefore })
+    @RenderBody()
+    @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.MainColumnAfter })
+</div>
+<script asp-location="Footer">
+        $(document).ready(function () {
+      var $sidebar = $(".side-2");
+      var $sidebarOverlay = $("<div class='sidebar-overlay'></div>").appendTo("body");
+      var $breadcrumb = $(".master-column-wrapper .breadcrumb");
+      var $sidebarParent = $breadcrumb.parent();
+      var $breadcrumbNext = $breadcrumb.next();
+      var $pageTitle = $(".page-title");
+      var $center2 = $(".center-2");
+
+      // Ensure sidebar toggle button exists in .page-title
+      if ($pageTitle.length && !$pageTitle.find(".sidebar-toggle-btn").length) {
+        $pageTitle.append('<button class="sidebar-toggle-btn"><i class="fa fa-sliders"></i></button>');
+      }
+
+      // Append close button to the sidebar
+      if ($sidebar.length && !$sidebar.find(".sidebar-close-btn").length) {
+        $sidebar.append('<button class="sidebar-close-btn"><i class="fa fa-times"></i></button>');
+      }
+
+      // Function to toggle sidebar and overlay
+      function toggleSidebar(isOpen) {
+        $sidebar.toggleClass("sidebar-open", isOpen);
+        $sidebarOverlay.toggleClass("overlay-active", isOpen);
+      }
+
+      // Open sidebar
+      $(document).on("click", ".sidebar-toggle-btn", function () {
+        toggleSidebar(true);
+      });
+
+      // Close sidebar when clicking close button or overlay
+      $(document).on("click", ".side-2 .sidebar-close-btn, .sidebar-overlay", function () {
+        toggleSidebar(false);
+      });
+
+      // Function to move sidebar based on window size
+      function adjustSidebarPosition() {
+        if ($(window).width() < 1001) {
+          if (!$sidebar.parent().is("body")) {
+            $sidebar.appendTo("body");
+          }
+        } else {
+          if (!$sidebar.parent().is($sidebarParent)) {
+            $sidebar.removeClass("sidebar-open");
+            if ($center2.length) {
+              $sidebar.insertBefore($center2); // Insert sidebar before .center-2 in web view
+            } else {
+              $sidebar.appendTo($sidebarParent);
+              $breadcrumbNext.length ? $sidebar.insertBefore($breadcrumbNext) : $sidebar.appendTo($sidebarParent);
+            }
+          }
+          $sidebarOverlay.removeClass("overlay-active"); // Hide overlay on resize back
+        }
+      }
+
+      // Run on page load and window resize
+      adjustSidebarPosition();
+      $(window).on("resize", adjustSidebarPosition);
+    });
+
+
+</script>

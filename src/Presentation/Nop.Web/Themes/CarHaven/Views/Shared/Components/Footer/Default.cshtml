@@ -1,0 +1,93 @@
+@model FooterModel
+
+@using Nop.Core
+@using Nop.Core.Domain.Tax
+@using Nop.Services.Configuration
+@using Nop.Services.Localization
+@using Nop.Services.Media
+@using Nop.Services.Themes
+
+@inject IWorkContext workContext
+@inject ILocalizationService localizationService
+@inject IPictureService pictureService
+@inject IStoreContext storeContext
+@inject ISettingService settingService
+@inject IThemeContext themeContext
+
+@{
+    var store = await storeContext.GetCurrentStoreAsync();
+    var storeName = await localizationService.GetLocalizedAsync(store, s => s.Name);
+    var hideDesignedByNopStation = await settingService.GetSettingByKeyAsync<bool>(
+        "CarHavenSettings.HideDesignedByNopStationAtFooter", storeId: store.Id, loadSharedValueIfNotFound: true);
+    var showSupportedCards = await settingService.GetSettingByKeyAsync<bool>(
+        "CarHavenSettings.ShowSupportedCardsAtFooter", storeId: store.Id, loadSharedValueIfNotFound: true);
+    var supportedCardsImageUrl = string.Empty;
+
+    if (showSupportedCards)
+    {
+        var pictureId = await settingService.GetSettingByKeyAsync<int>("CarHavenSettings.FooterSupportedCardsPictureId",
+            storeId: store.Id,
+            loadSharedValueIfNotFound: true);
+
+        supportedCardsImageUrl = await pictureService.GetPictureUrlAsync(pictureId);
+    }
+}
+
+<div class="footer">
+    <div class="footer-upper">
+        <div class="footer-links">
+            @await Component.InvokeAsync(typeof(FooterMenuViewComponent))
+        </div>
+        <div class="follow-us">
+            <div class="social">
+                <h2 class="title">
+                    @T("Footer.FollowUs")
+                </h2>
+                @await Component.InvokeAsync(typeof(SocialButtonsViewComponent))
+            </div>
+            @await Component.InvokeAsync(typeof(NewsLetterBoxViewComponent))
+            @if (showSupportedCards)
+            {
+                <div class="footer-block payment-method">
+                    <div class="title">
+                        <strong>@T("NopStation.Theme.CarHaven.FooterSupportedCards.Title")</strong>
+                    </div>
+                    <div class="payment-methods">
+                        <img class="payment-method-image" src="@supportedCardsImageUrl" alt="Payment methods" title="Payment methods" />
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="footer-lower">
+        @if (!Model.HidePoweredByNopCommerce)
+        {
+            <div class="footer-powered-by">
+                Powered by <a href="@(OfficialSite.Main)" target="_blank" @(Model.IsHomePage ? string.Empty : "rel=nofollow")>nopCommerce</a>
+            </div>
+        }
+
+        @if (!hideDesignedByNopStation)
+        {
+            <div class="footer-powered-by">
+                Designed By <img class="nopstation-logo" alt="Designed by nopStation : Your Trusted #1 nopCommerce Development Services Company" title="Designed by nopStation" src="/Themes/SpiceShop/Content/images/designed-by-nopstation.png" width="98" height="22">
+
+                <div class="seo-text">Your Trusted #1 <a href="https://www.nop-station.com">nopCommerce Development Services</a> Company </div>
+            </div>
+        }
+
+        <div class="footer-info">
+            <span class="footer-disclaimer">@T("Content.CopyrightNotice", DateTime.Now.Year, storeName)</span>
+            @if (Model.DisplayTaxShippingInfoFooter)
+            {
+                var inclTax = await workContext.GetTaxDisplayTypeAsync() == TaxDisplayType.IncludingTax;
+                <span class="footer-tax-shipping">
+                    @T(inclTax ? "Footer.TaxShipping.InclTax" : "Footer.TaxShipping.ExclTax", await NopUrl.RouteTopicUrlAsync("shippinginfo"))
+                </span>
+            }
+        </div>
+        @await Component.InvokeAsync(typeof(StoreThemeSelectorViewComponent))
+    </div>
+    @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.Footer, additionalData = Model })
+</div>
+
